@@ -22,7 +22,7 @@
         },
         "githubRepoURL": {
             "type": "string",
-            "defaultValue": "https://github.com/splunk/azure-functions-splunk.git"
+            "defaultValue": "https://github.com/splunk/azure-functions-splunk/graph"
         },
         "githubRepoBranch": {
             "type": "string",
@@ -43,13 +43,13 @@
         "ClientID" : {
             "type": "string",
             "metadata": {
-                "description": "<a href='https://github.com/splunk/azure-functions-splunk/blob/master/README.md'>Documentation</a>"
+                "description": "<a href='https://github.com/splunk/azure-functions-splunk/blob/master/graph/README.md'>Documentation</a>"
             }
         },
         "ClientSecret": {
             "type": "string",
             "metadata": {
-                "description": "<a href='https://github.com/splunk/azure-functions-splunk/blob/master/README.md'>Documentation</a>"
+                "description": "<a href='https://github.com/splunk/azure-functions-splunk/blob/master/graph/README.md'>Documentation</a>"
             }
         }
     },
