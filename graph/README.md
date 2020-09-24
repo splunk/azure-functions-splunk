@@ -16,7 +16,7 @@ When you register an application with Azure AD, you are creating an identity con
 
 ### 2. Deploy the functions to Azure
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsplunk%2azure-functions-splunk%2Fmaster%2Fgraph%2Fdeploy%2FazureDeploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsplunk%2Fazure-functions-splunk%2Fmaster%2Fgraph%2Fdeploy%2FazureDeploy.json)
 
 Use the above button to deploy the Azure Functions from this repo to your Azure account.  During setup, you will be prompted for the following information:
 
