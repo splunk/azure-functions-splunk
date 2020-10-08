@@ -22,7 +22,7 @@
         },
         "githubRepoURL": {
             "type": "string",
-            "defaultValue": "https://github.com/splunk/azure-functions-splunk/graph"
+            "defaultValue": "https://github.com/splunk/azure-functions-splunk.git"
         },
         "githubRepoBranch": {
             "type": "string",
@@ -137,6 +137,10 @@
                         {
                             "name": "TENANT_ID",
                             "value": "[subscription().tenantId]"
+                        },
+                        {
+                            "name": "Project",
+                            "value": "graph"
                         }
                     ]
                 }
