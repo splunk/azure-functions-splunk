@@ -18,7 +18,9 @@ const graph = require('../helpers/graph');
 const splunk = require('../helpers/splunk');
 
 module.exports = async function (context, notificationQueueItem) {
-    context.log('Queue trigger function processed work item', JSON.stringify(notificationQueueItem));
+    let msg = `[process-notification-queue] queue trigger function processed work item', ${JSON.stringify(notificationQueueItem)}`
+    context.log(msg);
+    splunk.logInfo(msg);
 
     let sourcetype = splunk.getSourcetype(notificationQueueItem);
     await graph.getResource(notificationQueueItem)
@@ -33,12 +35,15 @@ module.exports = async function (context, notificationQueueItem) {
         .then((payload) => {
             splunk.sendToHEC(payload)
             .catch((err) => {
-                context.log.error(`Error posting to Splunk HTTP Event Collector: ${err}`);
+                let msg = `[process-notification-queue] error posting to Splunk HTTP Event Collector: ${err}`;
+                context.log.error(msg);
                 return err;
             });
         })
         .catch((err) => {
-            context.log.error(`Error: ${JSON.stringify(err, null, 4)}`);
+            let msg = `[process-notification-queue] error: ${JSON.stringify(err, null, 4)}`;
+            context.log.error(msg);
+            splunk.logError(msg);
             throw err;
         });
 };

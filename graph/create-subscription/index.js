@@ -18,9 +18,12 @@ const { BlobServiceClient } = require("@azure/storage-blob");
 const blobServiceClient = BlobServiceClient.fromConnectionString(process.env["AzureWebJobsStorage"]);
 const containerClient = blobServiceClient.getContainerClient('subscriptions');
 const graph = require('../helpers/graph');
+const splunk = require('../helpers/splunk');
 
 module.exports = async function (context, req) {
-    context.log('create-subscription function triggered');
+    let message = '[create-subscription] function triggered';
+    context.log(message);
+    splunk.logInfo(message);
 
     // Currently only supporting call records
     let resource = "/communications/callRecords";
@@ -38,6 +41,7 @@ module.exports = async function (context, req) {
     await containerClient.createIfNotExists()
         .catch((err) => {
             context.log.error(err);
+            splunk.logError(`[create-subscription] ${JSON.stringify(err)}`);
             context.res = {
                 body: `Error creating subscription blob container: ${JSON.stringify(err, null, 4)}`
             };
@@ -46,8 +50,9 @@ module.exports = async function (context, req) {
 
     await graph.createSubscription(subscriptionBody)
         .then((subscription) => {
-            msg = `Created subscription: ${JSON.stringify(subscription, null, 4)}`
+            msg = `[create-subscription] created subscription: ${JSON.stringify(subscription, null, 4)}`
             context.log(msg);
+            splunk.logInfo(msg);
             return subscription;
         })
         .then((subscription) => {
@@ -67,16 +72,18 @@ module.exports = async function (context, req) {
                 .catch((err) => {
                     throw new Error(`The subscription was created, but there was an error writing the subscription contents to a blob container. Details: ${err}`)
                 });
-            let msg = `Successfully created subscription: ${JSON.stringify(subscription, null, 4)}`
+            let msg = `[create-subscription] successfully created subscription: ${JSON.stringify(subscription, null, 4)}`
             context.log(msg);
+            splunk.logInfo(msg);
             context.res = {
                 body: msg
             };
         })
         .catch((err) => {
             context.log.error(err);
+            splunk.logError(JSON.stringify(err));
             context.res = {
-                body: `Error deleting subscription: ${JSON.stringify(err, null, 4)}`
+                body: `[create-subscription] error: ${JSON.stringify(err, null, 4)}`
             };
             return;
         });

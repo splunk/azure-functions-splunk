@@ -15,9 +15,12 @@ limitations under the License.
 */
 
 const graph = require('../helpers/graph');
+const splunk = require('../helpers/splunk');
 
 module.exports = async function (context, req) {
-    context.log('get-subscriptions function triggered');
+    let msg = '[list-subscriptions] function triggered';
+    context.log(msg);
+    splunk.logInfo(msg);
 
     await graph.listSubscriptions()
         .then((subscriptions) => {
@@ -26,8 +29,9 @@ module.exports = async function (context, req) {
             };
         })
         .catch((err) => {
-            msg = `Error getting subscriptions: ${JSON.stringify(err, null, 4)}`
+            msg = `[list-subscriptions] error getting subscriptions: ${JSON.stringify(err, null, 4)}`
             context.log.err(msg);
+            splunk.logError(msg);
             context.res = {
                 body: msg
             }

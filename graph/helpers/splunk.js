@@ -40,6 +40,42 @@ const getSourcetype = function(resource) {
 
 }
 
+const logInfo = async function(message) {
+    let payload = {
+        "event": message,
+        "sourcetype": "m365:log:info"
+    }
+
+    sendToHEC(payload)
+        .catch((err) => {
+            return err;
+        });
+}
+
+const logError = async function(message) {
+    let payload = {
+        "event": message,
+        "sourcetype": "m365:log:error"
+    }
+
+    sendToHEC(payload)
+        .catch((err) => {
+            return err;
+        });
+}
+
+const logWarning = async function(message) {
+    let payload = {
+        "event": message,
+        "sourcetype": "m365:log:warn"
+    }
+
+    sendToHEC(payload)
+        .catch((err) => {
+            return err;
+        });
+}
+
 const sendToHEC = async function(payload) {
 
     let headers = {
@@ -56,3 +92,6 @@ const sendToHEC = async function(payload) {
 
 exports.getSourcetype = getSourcetype;
 exports.sendToHEC = sendToHEC;
+exports.logInfo = logInfo;
+exports.logError = logError;
+exports.logWarning = logWarning;
