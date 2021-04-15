@@ -4,11 +4,11 @@
 		{
 			"type": "func",
 			"command": "host start",
-			"problemMatcher": "$func-watch",
+			"problemMatcher": "$func-node-watch",
 			"isBackground": true,
 			"dependsOn": "npm install",
 			"options": {
-				"cwd": "${workspaceFolder}/graph"
+				"cwd": "${workspaceFolder}/event-hubs-hec"
 			}
 		},
 		{
@@ -16,7 +16,7 @@
 			"label": "npm install",
 			"command": "npm install",
 			"options": {
-				"cwd": "${workspaceFolder}/graph"
+				"cwd": "${workspaceFolder}/event-hubs-hec"
 			}
 		},
 		{
@@ -25,7 +25,7 @@
 			"command": "npm prune --production",
 			"problemMatcher": [],
 			"options": {
-				"cwd": "${workspaceFolder}/graph"
+				"cwd": "${workspaceFolder}/event-hubs-hec"
 			}
 		}
 	]
