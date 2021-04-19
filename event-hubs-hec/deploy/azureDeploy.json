@@ -20,13 +20,20 @@
                 "description": "Storage Account type"
             }
         },
-        "activityLogEHConnectionString": {
+        "eventHubConnectionString": {
             "type": "string",
             "metadata": {
                 "description": "Connection string for the activity log Event Hub"
             }
         },
-        "activityLogEHConsumerGroup": {
+        "activityLogHubName": {
+            "type": "string",
+            "defaultValue": "insights-activity-logs",
+            "metadata": {
+                "description": "Event Hub name containing activity logs"
+            }
+        },
+        "activityLogEventHubConsumerGroup": {
             "type": "string",
             "defaultValue": "$Default",
             "metadata": {
@@ -46,7 +53,7 @@
         },
         "githubRepoBranch": {
             "type": "string",
-            "defaultValue": "develop"
+            "defaultValue": "master"
         },
         "SplunkEndpoint": {
             "type": "string",
@@ -127,12 +134,16 @@
                             "value": "[toLower(variables('functionAppName'))]"
                         },
                         {
-                            "name": "ACTIVITY_LOG_EVENTHUB_CONNECTION_STRING",
-                            "value": "[parameters('activityLogEHConnectionString')]"
+                            "name": "EVENTHUB_CONNECTION_STRING",
+                            "value": "[parameters('eventHubConnectionString')]"
+                        },
+                        {
+                            "name": "ACTIVITY_LOG_HUB_NAME",
+                            "value": "[parameters('activityLogHubName')]"
                         },
                         {
                             "name": "ACTIVITY_LOG_CONSUMER_GROUP",
-                            "value": "[parameters('activityLogEHConsumerGroup')]"
+                            "value": "[parameters('activityLogEventHubConsumerGroup')]"
                         },
                         {
                             "name": "ACTIVITY_LOG_SOURCETYPE",
