@@ -1,7 +1,9 @@
 # Azure Functions for Sending Event Hub data to a Splunk HTTP Event Collector
 Events arriving on an Azure Event Hub can trigger serverless Azure Functions.  Azure Functions can further process the raw events in near real-time.
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsplunk%2Fazure-functions-splunk%2Fmaster%2Fevent-hubs-hec%2Fdeploy%2FazureDeploy.json)
+<a href="https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsplunk%2Fazure-functions-splunk%2Fevent-hubs%2Fdeploy%2FazureDeploy.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fsplunk%2Fazure-functions-splunk%2Fevent-hubs%2Fdeploy%2FazureDeploy.portal.json" target="_blank">
+<img src="https://aka.ms/deploytoazurebutton"/>
+</a>
 
 This repository contains a collection of Azure Functions for:
 * Processing events as they arrive on an Event Hub
@@ -23,9 +25,9 @@ An Event Hub Namespace will contain one or more Event Hubs.  Refer to the Micros
 Microsoft Azure uses [diagnostics settings](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings) to define data export and destination rules.  Each resrouce to be monitored must have a diagnostic setting.  Diagnostic settings can be defined using the Azure portal, PowerShell, [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/monitor/diagnostic-settings?view=azure-cli-latest), [Resource Manager templates](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings), REST API, or an Azure Policy.
 
 * [Sending Azure Activity log data to an Event Hub using the Azure Portal walkthrough](docs/activity_log_diagnostic_settings.md)
-* Sending Azure Diagnostic logs and metrics to an Event Hub
-* Sending Azure Active Directory logs to an Event Hub
-* Sending Azure Virtual Machine data to Splunk
+* [Sending Azure Diagnostic logs and metrics to an Event Hub](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings)
+* [Sending Azure Active Directory logs to an Event Hub](docs/azure_ad_diagnostic_settings.md)
+* Sending Azure Virtual Machine data to an Event Hub
   * [Windows VMs](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-windows)
   * [Linux VMs](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-linux)
 
