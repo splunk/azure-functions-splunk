@@ -16,6 +16,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "Activity Log Event Hub Name",
                         "toolTip": "tooltip",
+                        "defaultValue": "insights-activity-logs",
                         "constraints": {
                             "required": true
                         }
