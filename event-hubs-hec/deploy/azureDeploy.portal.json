@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+    "handler": "Microsoft.Azure.CreateUIDef",
+    "version": "0.1.2-preview",
+    "parameters": {
+        "basics": [{}],
+        "steps": [
+            {
+                "name": "ehActivityLogs",
+                "label": "Activity Logs",
+                "bladeSubtitle": "blade subtitle",
+                "bladeTitle": "blade title",
+                "elements": [
+                    {
+                        "name": "activityLogHubName",
+                        "type": "Microsoft.Common.TextBox",
+                        "label": "Activity Log Event Hub Name",
+                        "toolTip": "tooltip",
+                        "constraints": {
+                            "required": true
+                        }
+                    }
+                ]
+            }
+        ],
+        "outputs": {
+            "activityLogHubName": "[steps('ehActivityLogs').activityLogHubName]"
+        }
+    }
+}
