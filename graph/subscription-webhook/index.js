@@ -43,15 +43,19 @@ module.exports = async function (context, req) {
     }
     else {
         // Graph is sending us some data!
-        msg = '[subscription-webhook] received a subscription notification.';
+        msg = '[subscription-webhook] received a subscription notification: ' + JSON.stringify(req.body);
         context.log(msg);
         splunk.logInfo(msg);
-
-        for (let i = 0; i < req.body.value.length; i++) {
-            context.bindings.notificationQueue = req.body.value[i].resource;           
+        try {
+            splunk.logInfo(msg);
+            for (let i = 0; i < req.body.value.length; i++) {
+                context.bindings.notificationQueue = req.body.value[i].resource;           
+            }
+            // Send a status of 'Accepted'
+            context.res.status = 202;
+        } catch(err) {
+            context.log(err.message);
+            context.res.status = 500;
         }
-
-        // Send a status of 'Accepted'
-        context.res.status = 202;
     }
 };
