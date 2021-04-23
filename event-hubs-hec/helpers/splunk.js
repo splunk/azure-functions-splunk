@@ -15,6 +15,29 @@ limitations under the License.
 */
 const axios = require('axios');
 
+const getSourceType = function(sourcetype, resourceId, category) {
+
+    // If this is an AAD sourcetype, append the category to the sourcetype and return
+    let aadSourcetypes = [process.env["AAD_LOG_SOURCETYPE"], process.env["AAD_NON_INTERACTIVE_SIGNIN_LOG_SOURCETYPE"], process.env["AAD_SERVICE_PRINCIPAL_SIGNIN_LOG_SOURCETYPE"], process.env["AAD_PROVISIONING_LOG_SOURCETYPE"]];
+    if(aadSourcetypes.indexOf(sourcetype) > -1) {
+        return `${sourcetype}:${category.toLowerCase()}`;
+    }
+
+    // Set the sourcetype based on the resourceId
+    let sourcetypePattern = /PROVIDERS\/(.*?\/.*?)(?:\/)/;
+    try {
+        let st = resourceId.match(sourcetypePattern)[1]
+            .replace("MICROSOFT.", "azure:")
+            .replace('.', ':')
+            .replace('/', ':')
+            .toLowerCase();
+        return `${st}:${category.toLowerCase()}`;
+    } catch(err) {
+        // Could not detrmine the sourcetype from the resourceId
+        return sourcetype;
+    }
+}
+
 const getEpochTime = function(timeString) {
     try {
         let epochTime = new Date(timeString).getTime();
@@ -32,6 +55,7 @@ const getTimeStamp = function(message) {
 }
 
 const getHECPayload = async function(message, sourcetype) {
+
     try {
         jsonMessage = JSON.parse(message);
     } catch (err) {
@@ -40,17 +64,25 @@ const getHECPayload = async function(message, sourcetype) {
             "sourcetype": sourcetype,
             "event": message
         }
-        return payload
+        return payload;
     }
 
     // If the JSON contains a records[] array, batch the events for HEC.
     if(jsonMessage.hasOwnProperty('records')) {
         let payload = ''
+
         jsonMessage.records.forEach(function(record) {
-            recordEvent = {
+            
+            let recordEvent = {
                 "sourcetype": sourcetype,
                 "event": JSON.stringify(record)
             }
+            
+            if((record.hasOwnProperty('resourceId')) && (record.hasOwnProperty('category'))) {
+                // Get the sourcetype
+                recordEvent["sourcetype"] = getSourceType(sourcetype, record.resourceId, record.category);
+            }
+            
             let eventTimeStamp = getTimeStamp(record);
             if(eventTimeStamp) { recordEvent["time"] = eventTimeStamp; }
             payload += JSON.stringify(recordEvent);
@@ -75,11 +107,11 @@ const sendToHEC = async function(message, sourcetype) {
     }
 
     await getHECPayload(message, sourcetype)
-    .then(payload => {
-        return axios.post(process.env["SPLUNK_HEC_URL"], payload, {headers: headers});
-    })
-    .catch(err => {
-        throw err;
+        .then(payload => {
+            return axios.post(process.env["SPLUNK_HEC_URL"], payload, {headers: headers});
+        })
+        .catch(err => {
+            throw err;
     });
 }
 
