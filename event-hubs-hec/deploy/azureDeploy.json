@@ -23,9 +23,10 @@
         "eventHubConnectionString": {
             "type": "string",
             "metadata": {
-                "description": "Connection string for the activity log Event Hub"
+                "description": "Event Hub Namespace connection string"
             }
         },
+
         "activityLogHubName": {
             "type": "string",
             "defaultValue": "insights-activity-logs",
@@ -47,6 +48,141 @@
                 "description": "Splunk source type for the activity log Event Hub"
             }
         },
+        "activityLogDisabled": {
+            "type": "bool",
+            "defaultValue": false
+        },
+
+        "aadLogHubName": {
+            "type": "string",
+            "defaultValue": "insights-logs-aad",
+            "metadata": {
+                "description": "Event Hub name containing Azure Active Directory logs"
+            }
+        },
+        "aadLogEventHubConsumerGroup": {
+            "type": "string",
+            "defaultValue": "$Default",
+            "metadata": {
+                "description": "Consumer group for the Azure Active Directory log Event Hub"
+            }
+        },
+        "aadLogSourceType": {
+            "type": "string",
+            "defaultValue": "azure:aad",
+            "metadata": {
+                "description": "Splunk source type for the Azure Active Directory log Event Hub"
+            }
+        },
+        "aadLogDisabled": {
+            "type": "bool",
+            "defaultValue": false
+        },
+
+        "aadNoninteractiveLogHubName": {
+            "type": "string",
+            "defaultValue": "insights-logs-noninteractiveusersigninlogs",
+            "metadata": {
+                "description": "Event Hub name containing Azure Active Directory non-interactive logs"
+            }
+        },
+        "aadNoninteractiveLogEventHubConsumerGroup": {
+            "type": "string",
+            "defaultValue": "$Default",
+            "metadata": {
+                "description": "Consumer group for the Azure Active Directory non-interactive log Event Hub"
+            }
+        },
+        "aadNoninteractiveLogSourceType": {
+            "type": "string",
+            "defaultValue": "azure:aad:signin:noninteractive",
+            "metadata": {
+                "description": "Splunk source type for the Azure Active Directory non-interactive log Event Hub"
+            }
+        },
+        "aadNoninteractiveLogDisabled": {
+            "type": "bool",
+            "defaultValue": true
+        },
+
+        "aadServicePrincipalLogHubName": {
+            "type": "string",
+            "defaultValue": "insights-logs-serviceprincipalsigninlogs",
+            "metadata": {
+                "description": "Event Hub name containing Azure Active Directory Service Principal logs"
+            }
+        },
+        "aadServicePrincipalLogEventHubConsumerGroup": {
+            "type": "string",
+            "defaultValue": "$Default",
+            "metadata": {
+                "description": "Consumer group for the Azure Active Directory Service Principal log Event Hub"
+            }
+        },
+        "aadServicePrincipalLogSourceType": {
+            "type": "string",
+            "defaultValue": "azure:aad:signin:serviceprincipal",
+            "metadata": {
+                "description": "Splunk source type for the Azure Active Directory Service Principal log Event Hub"
+            }
+        },
+        "aadServicePrincipalLogDisabled": {
+            "type": "bool",
+            "defaultValue": true
+        },
+
+        "metricsHubName": {
+            "type": "string",
+            "defaultValue": "insights-metrics-pt1m",
+            "metadata": {
+                "description": "Event Hub name containing metrics"
+            }
+        },
+        "metricsEventHubConsumerGroup": {
+            "type": "string",
+            "defaultValue": "$Default",
+            "metadata": {
+                "description": "Consumer group for the metrics Event Hub"
+            }
+        },
+        "metricsSourceType": {
+            "type": "string",
+            "defaultValue": "azure:metrics",
+            "metadata": {
+                "description": "Splunk source type for the metrics Event Hub"
+            }
+        },
+        "metricsDisabled": {
+            "type": "bool",
+            "defaultValue": true
+        },
+
+        "diagnosticsHubName": {
+            "type": "string",
+            "defaultValue": "insights-logs-diag",
+            "metadata": {
+                "description": "Event Hub name containing diagnostics"
+            }
+        },
+        "diagnosticsEventHubConsumerGroup": {
+            "type": "string",
+            "defaultValue": "$Default",
+            "metadata": {
+                "description": "Consumer group for the diagnostics Event Hub"
+            }
+        },
+        "diagnosticsSourceType": {
+            "type": "string",
+            "defaultValue": "azure:diagnostics",
+            "metadata": {
+                "description": "Splunk source type for the diagnostics Event Hub"
+            }
+        },
+        "diagnosticsDisabled": {
+            "type": "bool",
+            "defaultValue": true
+        }, 
+
         "githubRepoURL": {
             "type": "string",
             "defaultValue": "https://github.com/splunk/azure-functions-splunk.git"
@@ -54,6 +190,10 @@
         "githubRepoBranch": {
             "type": "string",
             "defaultValue": "master"
+        },
+        "githubRepoProject": {
+            "type": "string",
+            "defaultValue": "event-hubs-hec"
         },
         "SplunkEndpoint": {
             "type": "string",
@@ -150,6 +290,96 @@
                             "value": "[parameters('activityLogSourceType')]"
                         },
                         {
+                            "name": "AzureWebJobs.activity-logs.Disabled",
+                            "value": "[parameters('activityLogDisabled')]"
+                        },
+
+                        {
+                            "name": "AAD_LOG_HUB_NAME",
+                            "value": "[parameters('aadLogHubName')]"
+                        },
+                        {
+                            "name": "AAD_LOG_CONSUMER_GROUP",
+                            "value": "[parameters('aadLogEventHubConsumerGroup')]"
+                        },
+                        {
+                            "name": "AAD_LOG_SOURCETYPE",
+                            "value": "[parameters('aadLogSourceType')]"
+                        },
+                        {
+                            "name": "AzureWebJobs.aad-logs.Disabled",
+                            "value": "[parameters('aadLogDisabled')]"
+                        },
+
+                        {
+                            "name": "AAD_NON_INTERACTIVE_SIGNIN_LOG_HUB_NAME",
+                            "value": "[parameters('aadNoninteractiveLogHubName')]"
+                        },
+                        {
+                            "name": "AAD_NON_INTERACTIVE_SIGNIN_LOG_CONSUMER_GROUP",
+                            "value": "[parameters('aadNoninteractiveLogEventHubConsumerGroup')]"
+                        },
+                        {
+                            "name": "AAD_NON_INTERACTIVE_SIGNIN_LOG_SOURCETYPE",
+                            "value": "[parameters('aadNoninteractiveLogSourceType')]"
+                        },
+                        {
+                            "name": "AzureWebJobs.aad-signin-logs-non-interactive.Disabled",
+                            "value": "[parameters('aadNoninteractiveLogDisabled')]"
+                        },
+
+                        {
+                            "name": "AAD_SERVICE_PRINCIPAL_SIGNIN_LOG_HUB_NAME",
+                            "value": "[parameters('aadServicePrincipalLogHubName')]"
+                        },
+                        {
+                            "name": "AAD_SERVICE_PRINCIPAL_SIGNIN_LOG_CONSUMER_GROUP",
+                            "value": "[parameters('aadServicePrincipalLogEventHubConsumerGroup')]"
+                        },
+                        {
+                            "name": "AAD_SERVICE_PRINCIPAL_SIGNIN_LOG_SOURCETYPE",
+                            "value": "[parameters('aadServicePrincipalLogSourceType')]"
+                        },
+                        {
+                            "name": "AzureWebJobs.aad-signin-logs-service-principal.Disabled",
+                            "value": "[parameters('aadServicePrincipalLogDisabled')]"
+                        },
+
+                        {
+                            "name": "METRICS_LOG_HUB_NAME",
+                            "value": "[parameters('metricsHubName')]"
+                        },
+                        {
+                            "name": "METRICS_LOG_CONSUMER_GROUP",
+                            "value": "[parameters('metricsEventHubConsumerGroup')]"
+                        },
+                        {
+                            "name": "METRICS_LOG_SOURCETYPE",
+                            "value": "[parameters('metricsSourceType')]"
+                        },
+                        {
+                            "name": "AzureWebJobs.metrics.Disabled",
+                            "value": "[parameters('metricsDisabled')]"
+                        },
+
+                        {
+                            "name": "DIAGNOSTIC_LOG_HUB_NAME",
+                            "value": "[parameters('diagnosticsHubName')]"
+                        },
+                        {
+                            "name": "DIAGNOSTIC_LOG_SOURCETYPE",
+                            "value": "[parameters('diagnosticsEventHubConsumerGroup')]"
+                        },
+                        {
+                            "name": "DIAGNOSTIC_LOG_SOURCETYPE",
+                            "value": "[parameters('diagnosticsSourceType')]"
+                        },
+                        {
+                            "name": "AzureWebJobs.diatnostic-logs.Disabled",
+                            "value": "[parameters('diagnosticsDisabled')]"
+                        },
+
+                        {
                             "name": "SPLUNK_HEC_TOKEN",
                             "value": "[parameters('SplunkToken')]"
                         },
@@ -163,7 +393,7 @@
                         },
                         {
                             "name": "Project",
-                            "value": "event-hubs-hec"
+                            "value": "[parameters('githubRepoProject')]"
                         }
                     ]
                 }
