@@ -367,7 +367,7 @@
                             "value": "[parameters('diagnosticsHubName')]"
                         },
                         {
-                            "name": "DIAGNOSTIC_LOG_SOURCETYPE",
+                            "name": "DIAGNOSTIC_LOG_CONSUMER_GROUP",
                             "value": "[parameters('diagnosticsEventHubConsumerGroup')]"
                         },
                         {
