@@ -72,6 +72,17 @@ module.exports = async function (context, myTimer) {
         splunk.logInfo(`[update-subscriptions] updating subscription ${JSON.stringify(subscription)}. New expiration: ${newSubscriptionExpirationDateTime}`);
         
         await graph.updateSubscriptionExpiration(subscription.subscriptionId, newSubscriptionExpirationDateTime)
+            .then(() => {
+                // Update the blob with the new subscription expiration 
+                subscriptionBlobItem = {
+                    "subscriptionId": subscription.subscriptionId,
+                    "subscriptionExpirationDateTime": newSubscriptionExpirationDateTime
+                }
+                let blobContent = JSON.stringify(subscriptionBlobItem);
+                let blobName = subscription.subscriptionId;
+                let blockBlobClient = containerClient.getBlockBlobClient(blobName);
+                blockBlobClient.upload(blobContent, blobContent.length);
+            })
             .catch((err) => {
                 if ((err.statusCode = 404) && (!err.message.includes("timed out"))) {
                     // Looks like this subscription was removed, so remove it from the blob container.

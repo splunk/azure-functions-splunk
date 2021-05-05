@@ -1,0 +1,13 @@
+{
+  "name": "event-hubs-hec",
+  "version": "1.0.0",
+  "description": "Sends Event Hub events to Splunk's HTTP Event Collector",
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {
+    "axios": "^0.19.2"
+  },
+  "devDependencies": {}
+}

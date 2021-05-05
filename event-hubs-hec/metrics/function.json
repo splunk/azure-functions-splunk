@@ -1,0 +1,21 @@
+{
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "name": "eventHubMessages",
+      "direction": "in",
+      "eventHubName": "%METRICS_LOG_HUB_NAME%",
+      "connection": "EVENTHUB_CONNECTION_STRING",
+      "cardinality": "many",
+      "consumerGroup": "%METRICS_LOG_CONSUMER_GROUP%",
+      "dataType": "string"
+    },
+    {
+      "name": "outputBlob",
+      "type": "blob",
+      "path": "undeliverable-events/%METRICS_LOG_SOURCETYPE%-{rand-guid}",
+      "connection": "BLOB_CONNECTION_STRING",
+      "direction": "out"
+    }
+  ]
+}

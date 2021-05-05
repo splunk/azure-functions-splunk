@@ -11,7 +11,23 @@ Each available set of functions in this repository is contained within its own f
 | Functions | Location | Description |
 | --------- | -------- | ----------- |
 | Microsoft Teams | [graph](https://github.com/splunk/azure-functions-splunk/tree/master/graph) | Collects [Microsoft Teams call records]( https://docs.microsoft.com/en-us/graph/api/resources/callrecords-callrecord).  This data can be used with the [Microsoft 365 App for Splunk]( https://splunkbase.splunk.com/app/3786/) and/or the [RWI – Executive Dashboard]( https://splunkbase.splunk.com/app/4952/) |
+| Azure Event Hubs | [event-hubs-hec](https://github.com/splunk/azure-functions-splunk/tree/master/event-hubs) | These Azure Functions are triggered by events arriving on an Azure Event Hub.  The functions then process the events and send the event to a listening Splunk HTTP Event Collector |
 
+## Setting a Project Subpath
+[Multiple Azure Function projects](https://github.com/Microsoft/vscode-azurefunctions/wiki/Multiple-function-projects) exist in this repository.  In order to debug a specific function project, set the `azureFunctions.deploySubpath` and `azureFunctions.projectSubpath` parameters in `settings.json` to the appropriate path.
+
+For example, to run and debug the `Graph` functions use the following `settings.json`
+```
+{
+    "azureFunctions.postDeployTask": "npm install",
+    "azureFunctions.projectLanguage": "JavaScript",
+    "azureFunctions.projectRuntime": "~3",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.preDeployTask": "npm prune",
+    "azureFunctions.deploySubpath": "graph",
+    "azureFunctions.projectSubpath": "graph"
+}
+```
 
 ## Support
 

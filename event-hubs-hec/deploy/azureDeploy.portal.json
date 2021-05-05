@@ -1,0 +1,583 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+    "handler": "Microsoft.Azure.CreateUIDef",
+    "version": "0.1.2-preview",
+    "parameters": {
+        "config": {
+            "isWizard": false
+        },
+        "basics": [
+            {
+                "name": "appName",
+                "label": "Function App Name",
+                "type": "Microsoft.Common.TextBox",
+                "toolTip": "The name of the function app that you wish to create.",
+                "visible": true,
+                "constraints": {
+                    "required": true
+                }
+            },
+            {
+                "name": "storageAccountType",
+                "label": "Storage Account Type",
+                "type": "Microsoft.Common.DropDown",
+                "toolTip": "The storage account will contain a blob container for undeliverable events.",
+                "constraints": {
+                    "required": true,
+                    "allowedValues": [
+                        {
+                            "label": "Standard_LRS",
+                            "value": "Standard_LRS"
+                        },
+                        {
+                            "label": "Standard_GRS",
+                            "value": "Standard_GRS"
+                        },
+                        {
+                            "label": "Standard_RAGRS",
+                            "value": "Standard_RAGRS"
+                        }
+                    ]
+                }
+            }
+        ],
+        "steps": [
+            {
+                "name": "appSettings",
+                "label": "Function App Settings",
+                "elements": [
+                    {
+                        "name": "ehNsSection",
+                        "type": "Microsoft.Common.Section",
+                        "label": "Event Hub Namespace Details",
+                        "elements": []
+                    },
+                    {
+                        "name": "ehNamespaceApi",
+                        "type": "Microsoft.Solutions.ArmApiControl",
+                        "request": {
+                            "method": "GET",
+                            "path": "[concat(subscription().id, '/providers/Microsoft.EventHub/namespaces', '?api-version=2017-04-01')]"
+                        }
+                    },
+                    {
+                        "name": "ehNamespaceDropDown",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "Event Hub Namespace",
+                        "toolTip": "Event Hub Namespace containing the Event Hubs to monitor.",
+                        "filter": true,
+                        "constraints": {
+                            "allowedValues": "[map(steps('appSettings').ehNamespaceApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+                            "required": true
+                        },
+                        "visible": true
+                    },
+                    {
+                        "name": "ehPolicyApi",
+                        "type": "Microsoft.Solutions.ArmApiControl",
+                        "request": {
+                            "method": "GET",
+                            "path": "[concat(steps('appSettings').ehNamespaceDropDown, '/authorizationRules', '?api-version=2017-04-01')]"
+                        }
+                    },
+                    {
+                        "name": "ehPolicyDropDown",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "Event Hub Access Policy",
+                        "toolTip": "Specify a policy with a 'Listen' or greater claim.",
+                        "constraints": {
+                            "allowedValues": "[map(steps('appSettings').ehPolicyApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                            "required": true
+                        },
+                        "visible": true
+                    },
+                    {
+                        "name": "ehPolicyKeyApi",
+                        "type": "Microsoft.Solutions.ArmApiControl",
+                        "request": {
+                            "method": "POST",
+                            "path": "[concat(steps('appSettings').ehNamespaceDropDown, '/authorizationRules/', steps('appSettings').ehPolicyDropDown, '/listKeys', '?api-version=2017-04-01')]"
+                        }
+                    },
+                    {
+                        "name": "ehApi",
+                        "type": "Microsoft.Solutions.ArmApiControl",
+                        "request": {
+                            "method": "GET",
+                            "path": "[concat(steps('appSettings').ehNamespaceDropDown, '/eventhubs', '?api-version=2017-04-01')]"
+                        }
+                    },
+                    {
+                        "name": "splunkHECSection",
+                        "type": "Microsoft.Common.Section",
+                        "label": "Splunk HTTP Event Collector Details",
+                        "elements": [
+                            {
+                                "name": "splunkHECEndpoint",
+                                "label": "Splunk HEC Endpoint",
+                                "toolTip": "URL for the Splunk HTTP Event Collector.",
+                                "type": "Microsoft.Common.TextBox",
+                                "placeholder": "https://<YOUR SPLUNK URL>:<PORT>/services/collector/event",
+                                "constraints": {
+                                    "required": true
+                                }
+                            },
+                            {
+                                "name": "splunkHECToken",
+                                "label": "Splunk HEC Token",
+                                "toolTip": "Splunk HTTP Event Collector Token.",
+                                "type": "Microsoft.Common.TextBox",
+                                "constraints": {
+                                    "required": true
+                                }
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "repoSection",
+                        "type": "Microsoft.Common.Section",
+                        "label": "Function Repository",
+                        "elements": [
+                            {
+                                "name": "repoURL",
+                                "label": "Repository URL",
+                                "toolTip": "URL for the function code.",
+                                "type": "Microsoft.Common.TextBox",
+                                "defaultValue": "https://github.com/splunk/azure-functions-splunk.git",
+                                "constraints": {
+                                    "required": true
+                                }
+                            },
+                            {
+                                "name": "repoBranch",
+                                "label": "Branch",
+                                "defaultValue": "master",
+                                "type": "Microsoft.Common.TextBox",
+                                "constraints": {
+                                    "required": true
+                                }
+                            },
+                            {
+                                "name": "repoProject",
+                                "label": "Project",
+                                "toolTip": "If the source code for the function resides in a subdirectory, specify the subdirectory containing the code.",
+                                "type": "Microsoft.Common.TextBox",
+                                "defaultValue": "event-hubs-hec"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "ehActivityLogs",
+                "label": "Activity Logs",
+                "elements": [
+                    {
+                        "name": "ehActivityEnable",
+                        "type": "Microsoft.Common.CheckBox",
+                        "label": "Enable Activity Log Event Hub Functions",
+                        "defaultValue": "true"
+                    },
+                    {
+                        "name": "ehActivityDropDown",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "Activity Log Event Hub",
+                        "toolTip": "Event Hub containing activity data.",
+                        "defaultValue": "insights-activity-logs",
+                        "constraints": {
+                            "allowedValues": "[map(steps('appSettings').ehApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                            "required": "[steps('ehActivityLogs').ehActivityEnable]"
+                        },
+                        "visible": "[steps('ehActivityLogs').ehActivityEnable]"
+                    },
+                    {
+                        "name": "ehActivityConsumerGroupApi",
+                        "type": "Microsoft.Solutions.ArmApiControl",
+                        "request": {
+                            "method": "GET",
+                            "path": "[concat(steps('appSettings').ehNamespaceDropDown, '/eventhubs/', steps('ehActivityLogs').ehActivityDropDown, '/consumergroups', '?api-version=2017-04-01')]"
+                        }
+                    },
+                    {
+                        "name": "ehActivityConsumerGroupDropDown",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "Activity Log Consumer Group",
+                        "constraints": {
+                            "allowedValues": "[map(steps('ehActivityLogs').ehActivityConsumerGroupApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                            "required": "[steps('ehActivityLogs').ehActivityEnable]"
+                        },
+                        "visible": "[steps('ehActivityLogs').ehActivityEnable]"
+                    },
+                    {
+                        "name": "ehActivitySourcetype",
+                        "label": "Activity Log Sourcetype",
+                        "toolTip": "Splunk sourcetype for activity logs.",
+                        "type": "Microsoft.Common.TextBox",
+                        "defaultValue": "azure:activity:log",
+                        "placeholder": "azure:activity:log",
+                        "constraints": {
+                            "required": "[steps('ehActivityLogs').ehActivityEnable]"
+                        },
+                        "visible": "[steps('ehActivityLogs').ehActivityEnable]"
+                    }
+                ]
+            },
+            {
+                "name": "ehAADLogs",
+                "label": "Azure Active Directory",
+                "elements": [
+                    {
+                        "name": "ehAADSASection",
+                        "type": "Microsoft.Common.Section",
+                        "label": "Sign-In and Audit Logs",
+                        "elements": [
+                            {
+                                "name": "ehAADSAEnable",
+                                "type": "Microsoft.Common.CheckBox",
+                                "label": "Enable AAD Sign and Audit Event Hub Functions"
+                            },
+                            {
+                                "name": "ehAADSADropDown",
+                                "type": "Microsoft.Common.DropDown",
+                                "label": "AAD Sign-in and Audit Event Hub",
+                                "toolTip": "Event Hub containing Azure AD sign-in and audit data.",
+                                "defaultValue": "insights-activity-logs",
+                                "constraints": {
+                                    "allowedValues": "[map(steps('appSettings').ehApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                                    "required": "[steps('ehAADLogs').ehAADSASection.ehAADSAEnable]"
+                                },
+                                "visible": "[steps('ehAADLogs').ehAADSASection.ehAADSAEnable]"
+                            },
+                            {
+                                "name": "ehAADSAConsumerGroupApi",
+                                "type": "Microsoft.Solutions.ArmApiControl",
+                                "request": {
+                                    "method": "GET",
+                                    "path": "[concat(steps('appSettings').ehNamespaceDropDown, '/eventhubs/', steps('ehAADLogs').ehAADSASection.ehAADSADropDown, '/consumergroups', '?api-version=2017-04-01')]"
+                                }
+                            },
+                            {
+                                "name": "ehAADSAConsumerGroupDropDown",
+                                "type": "Microsoft.Common.DropDown",
+                                "label": "AAD Sign-in and Audit Consumer Group",
+                                "constraints": {
+                                    "allowedValues": "[map(steps('ehAADLogs').ehAADSASection.ehAADSAConsumerGroupApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                                    "required": "[steps('ehAADLogs').ehAADSASection.ehAADSAEnable]"
+                                },
+                                "visible": "[steps('ehAADLogs').ehAADSASection.ehAADSAEnable]"
+                            },
+                            {
+                                "name": "ehAADSASourcetype",
+                                "label": "AAD Sign-in and Audit Sourcetype Base",
+                                "toolTip": "Splunk sourcetype base for Azure AD sign-in and activity data.",
+                                "type": "Microsoft.Common.TextBox",
+                                "defaultValue": "azure:aad",
+                                "placeholder": "azure:aad",
+                                "constraints": {
+                                    "required": "[steps('ehAADLogs').ehAADSASection.ehAADSAEnable]"
+                                },
+                                "visible": "[steps('ehAADLogs').ehAADSASection.ehAADSAEnable]"
+                            },
+                            {
+                                "name": "ehAADSASourcetypeInfo",
+                                "type": "Microsoft.Common.InfoBox",
+                                "visible": "[steps('ehAADLogs').ehAADSASection.ehAADSAEnable]",
+                                "options": {
+                                  "icon": "Info",
+                                  "text": "The base sourcetype will be combined with the event category to construct the full Splunk sourcetype.",
+                                  "uri": "https://github.com/splunk/azure-functions-splunk/tree/event-hubs/event-hubs-hec#splunk-sourcetypes"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ehAADNISection",
+                        "type": "Microsoft.Common.Section",
+                        "label": "Non-interactive User Sign-In Logs",
+                        "elements": [
+                            {
+                                "name": "ehAADNIEnable",
+                                "type": "Microsoft.Common.CheckBox",
+                                "label": "Enable AAD Non-interactive User Sign-In Log Functions"
+                            },
+                            {
+                                "name": "ehAADNIDropDown",
+                                "type": "Microsoft.Common.DropDown",
+                                "label": "AAD Non-interactive User Sign-In Event Hub",
+                                "toolTip": "Event Hub containing Azure AD non-interactive user sign-in data.",
+                                "defaultValue": "insights-logs-noninteractiveusersigninlogs",
+                                "constraints": {
+                                    "allowedValues": "[map(steps('appSettings').ehApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                                    "required": "[steps('ehAADLogs').ehAADNISection.ehAADNIEnable]"
+                                },
+                                "visible": "[steps('ehAADLogs').ehAADNISection.ehAADNIEnable]"
+                            },
+                            {
+                                "name": "ehAADNIConsumerGroupApi",
+                                "type": "Microsoft.Solutions.ArmApiControl",
+                                "request": {
+                                    "method": "GET",
+                                    "path": "[concat(steps('appSettings').ehNamespaceDropDown, '/eventhubs/', steps('ehAADLogs').ehAADNISection.ehAADNIDropDown, '/consumergroups', '?api-version=2017-04-01')]"
+                                }
+                            },
+                            {
+                                "name": "ehAADNIConsumerGroupDropDown",
+                                "type": "Microsoft.Common.DropDown",
+                                "label": "AAD Non-interactive User Sign-In Consumer Group",
+                                "constraints": {
+                                    "allowedValues": "[map(steps('ehAADLogs').ehAADNISection.ehAADNIConsumerGroupApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                                    "required": "[steps('ehAADLogs').ehAADNISection.ehAADNIEnable]"
+                                },
+                                "visible": "[steps('ehAADLogs').ehAADNISection.ehAADNIEnable]"
+                            },
+                            {
+                                "name": "ehAADNISourcetype",
+                                "label": "AAD Non-interactive User Sign-In Sourcetype",
+                                "toolTip": "Splunk sourcetype for Azure AD non-interactive user sign-in data.",
+                                "type": "Microsoft.Common.TextBox",
+                                "defaultValue": "azure:aad:signin:noninteractive",
+                                "placeholder": "azure:aad:signin:noninteractive",
+                                "constraints": {
+                                    "required": "[steps('ehAADLogs').ehAADNISection.ehAADNIEnable]"
+                                },
+                                "visible": "[steps('ehAADLogs').ehAADNISection.ehAADNIEnable]"
+                            },
+                            {
+                                "name": "ehAADNISourcetypeInfo",
+                                "type": "Microsoft.Common.InfoBox",
+                                "visible": "[steps('ehAADLogs').ehAADNISection.ehAADNIEnable]",
+                                "options": {
+                                  "icon": "Info",
+                                  "text": "The base sourcetype will be combined with the event category to construct the full Splunk sourcetype.",
+                                  "uri": "https://github.com/splunk/azure-functions-splunk/tree/event-hubs/event-hubs-hec#splunk-sourcetypes"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ehAADSPSection",
+                        "type": "Microsoft.Common.Section",
+                        "label": "Service Principal Sign-In Logs",
+                        "elements": [
+                            {
+                                "name": "ehAADSPEnable",
+                                "type": "Microsoft.Common.CheckBox",
+                                "label": "Enable AAD Service Principal Sign-In Log Functions"
+                            },
+                            {
+                                "name": "ehAADSPDropDown",
+                                "type": "Microsoft.Common.DropDown",
+                                "label": "AAD Service Principal Sign-In Event Hub",
+                                "toolTip": "Event Hub containing Azure AD Service Principal sign-in data.",
+                                "defaultValue": "insights-logs-serviceprincipalsigninlogs",
+                                "constraints": {
+                                    "allowedValues": "[map(steps('appSettings').ehApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                                    "required": "[steps('ehAADLogs').ehAADSPSection.ehAADSPEnable]"
+                                },
+                                "visible": "[steps('ehAADLogs').ehAADSPSection.ehAADSPEnable]"
+                            },
+                            {
+                                "name": "ehAADSPConsumerGroupApi",
+                                "type": "Microsoft.Solutions.ArmApiControl",
+                                "request": {
+                                    "method": "GET",
+                                    "path": "[concat(steps('appSettings').ehNamespaceDropDown, '/eventhubs/', steps('ehAADLogs').ehAADSPSection.ehAADSPDropDown, '/consumergroups', '?api-version=2017-04-01')]"
+                                }
+                            },
+                            {
+                                "name": "ehAADSPConsumerGroupDropDown",
+                                "type": "Microsoft.Common.DropDown",
+                                "label": "AAD Service Principal Sign-In Consumer Group",
+                                "constraints": {
+                                    "allowedValues": "[map(steps('ehAADLogs').ehAADSPSection.ehAADSPConsumerGroupApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                                    "required": "[steps('ehAADLogs').ehAADSPSection.ehAADSPEnable]"
+                                },
+                                "visible": "[steps('ehAADLogs').ehAADSPSection.ehAADSPEnable]"
+                            },
+                            {
+                                "name": "ehAADSPSourcetype",
+                                "label": "AAD Service Principal Sign-In Sourcetype",
+                                "toolTip": "Splunk sourcetype for Azure AD service principal sign-in data.",
+                                "type": "Microsoft.Common.TextBox",
+                                "defaultValue": "azure:aad:signin:serviceprincipal",
+                                "placeholder": "azure:aad:signin:serviceprincipal",
+                                "constraints": {
+                                    "required": "[steps('ehAADLogs').ehAADSPSection.ehAADSPEnable]"
+                                },
+                                "visible": "[steps('ehAADLogs').ehAADSPSection.ehAADSPEnable]"
+                            },
+                            {
+                                "name": "ehAADSPSourcetypeInfo",
+                                "type": "Microsoft.Common.InfoBox",
+                                "visible": "[steps('ehAADLogs').ehAADSPSection.ehAADSPEnable]",
+                                "options": {
+                                  "icon": "Info",
+                                  "text": "The base sourcetype will be combined with the event category to construct the full Splunk sourcetype.",
+                                  "uri": "https://github.com/splunk/azure-functions-splunk/tree/event-hubs/event-hubs-hec#splunk-sourcetypes"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "ehDiagnosticsLogs",
+                "label": "Diagnostics",
+                "elements": [
+                    {
+                        "name": "ehDiagnosticsEnable",
+                        "type": "Microsoft.Common.CheckBox",
+                        "label": "Enable Diagnostic Log Event Hub Functions"
+                    },
+                    {
+                        "name": "ehDiagnosticsDropDown",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "Diagnostics Log Event Hub",
+                        "toolTip": "Event Hub containing diagnostics data.",
+                        "defaultValue": "insights-logs-diag",
+                        "constraints": {
+                            "allowedValues": "[map(steps('appSettings').ehApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                            "required": "[steps('ehDiagnosticsLogs').ehDiagnosticsEnable]"
+                        },
+                        "visible": "[steps('ehDiagnosticsLogs').ehDiagnosticsEnable]"
+                    },
+                    {
+                        "name": "ehDiagnosticsConsumerGroupApi",
+                        "type": "Microsoft.Solutions.ArmApiControl",
+                        "request": {
+                            "method": "GET",
+                            "path": "[concat(steps('appSettings').ehNamespaceDropDown, '/eventhubs/', steps('ehDiagnosticsLogs').ehDiagnosticsDropDown, '/consumergroups', '?api-version=2017-04-01')]"
+                        }
+                    },
+                    {
+                        "name": "ehDiagnosticsConsumerGroupDropDown",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "Diagnostics Log Consumer Group",
+                        "constraints": {
+                            "allowedValues": "[map(steps('ehDiagnosticsLogs').ehDiagnosticsConsumerGroupApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                            "required": "[steps('ehDiagnosticsLogs').ehDiagnosticsEnable]"
+                        },
+                        "visible": "[steps('ehDiagnosticsLogs').ehDiagnosticsEnable]"
+                    },
+                    {
+                        "name": "ehDiagnosticsSourcetype",
+                        "label": "Diagnostics Log Default Sourcetype",
+                        "toolTip": "Splunk default sourcetype for diagnostics logs.",
+                        "type": "Microsoft.Common.TextBox",
+                        "defaultValue": "azure:diagnostics",
+                        "placeholder": "azure:diagnostics",
+                        "constraints": {
+                            "required": "[steps('ehDiagnosticsLogs').ehDiagnosticsEnable]"
+                        },
+                        "visible": "[steps('ehDiagnosticsLogs').ehDiagnosticsEnable]"
+                    },
+                    {
+                        "name": "ehDiagnosticsSourcetypeInfo",
+                        "type": "Microsoft.Common.InfoBox",
+                        "visible": "[steps('ehDiagnosticsLogs').ehDiagnosticsEnable]",
+                        "options": {
+                          "icon": "Info",
+                          "text": "The function code will attempt to create a Splunk sourcetype based on the resourceId of the event. If a sourcetype cannot be constructed from the event, the specified default sourcetype entered will be used.",
+                          "uri": "https://github.com/splunk/azure-functions-splunk/tree/event-hubs/event-hubs-hec#splunk-sourcetypes"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "ehMetrics",
+                "label": "Metrics",
+                "elements": [
+                    {
+                        "name": "ehMetricsEnable",
+                        "type": "Microsoft.Common.CheckBox",
+                        "label": "Enable Metrics Event Hub Functions"
+                    },
+                    {
+                        "name": "ehMetricsDropDown",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "Metrics Event Hub",
+                        "toolTip": "Event Hub containing metric data.",
+                        "defaultValue": "insights-metrics-pt1m",
+                        "constraints": {
+                            "allowedValues": "[map(steps('appSettings').ehApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                            "required": "[steps('ehMetrics').ehMetricsEnable]"
+                        },
+                        "visible": "[steps('ehMetrics').ehMetricsEnable]"
+                    },
+                    {
+                        "name": "ehMetricsConsumerGroupApi",
+                        "type": "Microsoft.Solutions.ArmApiControl",
+                        "request": {
+                            "method": "GET",
+                            "path": "[concat(steps('appSettings').ehNamespaceDropDown, '/eventhubs/', steps('ehMetrics').ehMetricsDropDown, '/consumergroups', '?api-version=2017-04-01')]"
+                        }
+                    },
+                    {
+                        "name": "ehMetricsConsumerGroupDropDown",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "Metrics Consumer Group",
+                        "constraints": {
+                            "allowedValues": "[map(steps('ehMetrics').ehMetricsConsumerGroupApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                            "required": "[steps('ehMetrics').ehMetricsEnable]"
+                        },
+                        "visible": "[steps('ehMetrics').ehMetricsEnable]"
+                    },
+                    {
+                        "name": "ehMetricsSourcetype",
+                        "label": "Metrics Sourcetype",
+                        "toolTip": "Splunk sourcetype for metrics.",
+                        "type": "Microsoft.Common.TextBox",
+                        "defaultValue": "azure:metrics",
+                        "placeholder": "azure:metrics",
+                        "constraints": {
+                            "required": "[steps('ehMetrics').ehMetricsEnable]"
+                        },
+                        "visible": "[steps('ehMetrics').ehMetricsEnable]"
+                    }
+                ]
+            }
+        ],
+        "outputs": {
+            "storageAccountType": "[steps('basics').storageAccountType]",
+            "appName": "[steps('basics').appName]",
+
+            "eventHubConnectionString": "[steps('appSettings').ehPolicyKeyApi.primaryConnectionString]",
+            "SplunkEndpoint": "[steps('appSettings').splunkHECSection.splunkHECEndpoint]",
+            "SplunkToken": "[steps('appSettings').splunkHECSection.splunkHECToken]",
+            "githubRepoURL": "[steps('appSettings').repoSection.repoURL]",
+            "githubRepoBranch": "[steps('appSettings').repoSection.repoBranch]",
+            "githubRepoProject": "[steps('appSettings').repoSection.repoProject]",
+
+            "activityLogHubName": "[steps('ehActivityLogs').ehActivityDropDown]",
+            "activityLogEventHubConsumerGroup": "[steps('ehActivityLogs').ehActivityConsumerGroupDropDown]",
+            "activityLogSourceType": "[steps('ehActivityLogs').ehActivitySourcetype]",
+            "activityLogDisabled": "[if(steps('ehActivityLogs').ehActivityEnable, false, true)]",
+
+            "aadLogHubName": "[steps('ehAADLogs').ehAADSASection.ehAADSADropDown]",
+            "aadLogEventHubConsumerGroup": "[steps('ehAADLogs').ehAADSASection.ehAADSAConsumerGroupDropDown]",
+            "aadLogSourceType": "[steps('ehAADLogs').ehAADSASection.ehAADSASourcetype]",
+            "aadLogDisabled": "[if(steps('ehAADLogs').ehAADSASection.ehAADSAEnable, false, true)]",
+
+            "aadNoninteractiveLogHubName": "[steps('ehAADLogs').ehAADNISection.ehAADNIDropDown]",
+            "aadNoninteractiveLogEventHubConsumerGroup": "[steps('ehAADLogs').ehAADNISection.ehAADNIConsumerGroupDropDown]",
+            "aadNoninteractiveLogSourceType": "[steps('ehAADLogs').ehAADNISection.ehAADNISourcetype]",
+            "aadNoninteractiveLogDisabled": "[if(steps('ehAADLogs').ehAADNISection.ehAADNIEnable, false, true)]",
+
+            "aadServicePrincipalLogHubName": "[steps('ehAADLogs').ehAADSPSection.ehAADSPDropDown]",
+            "aadServicePrincipalLogEventHubConsumerGroup": "[steps('ehAADLogs').ehAADSPSection.ehAADSPConsumerGroupDropDown]",
+            "aadServicePrincipalLogSourceType": "[steps('ehAADLogs').ehAADSPSection.ehAADSPSourcetype]",
+            "aadServicePrincipalLogDisabled": "[if(steps('ehAADLogs').ehAADSPSection.ehAADSPEnable, false, true)]",
+
+            "diagnosticsHubName": "[steps('ehDiagnosticsLogs').ehDiagnosticsDropDown]",
+            "diagnosticsEventHubConsumerGroup": "[steps('ehDiagnosticsLogs').ehDiagnosticsConsumerGroupDropDown]",
+            "diagnosticsSourceType": "[steps('ehDiagnosticsLogs').ehDiagnosticsSourcetype]",
+            "diagnosticsDisabled": "[if(steps('ehDiagnosticsLogs').ehDiagnosticsEnable, false, true)]",
+
+            "metricsHubName": "[steps('ehMetrics').ehMetricsDropDown]",
+            "metricsEventHubConsumerGroup": "[steps('ehMetrics').ehMetricsConsumerGroupDropDown]",
+            "metricsSourceType": "[steps('ehMetrics').ehMetricsSourcetype]",
+            "metricsDisabled": "[if(steps('ehMetrics').ehMetricsEnable, false, true)]"
+        }
+    }
+}

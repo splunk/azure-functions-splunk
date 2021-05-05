@@ -92,6 +92,3 @@ bin
 obj
 appsettings.json
 local.settings.json
-
-# Workstation
-.DS_Store
