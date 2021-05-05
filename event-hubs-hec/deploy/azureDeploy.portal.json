@@ -4,7 +4,7 @@
     "version": "0.1.2-preview",
     "parameters": {
         "config": {
-            "isWizard": true
+            "isWizard": false
         },
         "basics": [
             {
@@ -84,7 +84,7 @@
                         "name": "ehPolicyDropDown",
                         "type": "Microsoft.Common.DropDown",
                         "label": "Event Hub Access Policy",
-                        "toolTip": "Specify a policy with a 'Listen' claim.",
+                        "toolTip": "Specify a policy with a 'Listen' or greater claim.",
                         "constraints": {
                             "allowedValues": "[map(steps('appSettings').ehPolicyApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
                             "required": true
@@ -115,7 +115,7 @@
                             {
                                 "name": "splunkHECEndpoint",
                                 "label": "Splunk HEC Endpoint",
-                                "toolTip": "URL for the Splunk HTTP Event Collector",
+                                "toolTip": "URL for the Splunk HTTP Event Collector.",
                                 "type": "Microsoft.Common.TextBox",
                                 "placeholder": "https://<YOUR SPLUNK URL>:<PORT>/services/collector/event",
                                 "constraints": {
@@ -125,7 +125,7 @@
                             {
                                 "name": "splunkHECToken",
                                 "label": "Splunk HEC Token",
-                                "toolTip": "Splunk HTTP Event Collector Token",
+                                "toolTip": "Splunk HTTP Event Collector Token.",
                                 "type": "Microsoft.Common.TextBox",
                                 "constraints": {
                                     "required": true
@@ -142,7 +142,7 @@
                             {
                                 "name": "repoURL",
                                 "label": "Repository URL",
-                                "toolTip": "URL for the function code",
+                                "toolTip": "URL for the function code.",
                                 "type": "Microsoft.Common.TextBox",
                                 "defaultValue": "https://github.com/splunk/azure-functions-splunk.git",
                                 "constraints": {
@@ -161,7 +161,7 @@
                             {
                                 "name": "repoProject",
                                 "label": "Project",
-                                "toolTip": "If the source code for the function resides in a subdirectory, specify the subdirctory containing the code.",
+                                "toolTip": "If the source code for the function resides in a subdirectory, specify the subdirectory containing the code.",
                                 "type": "Microsoft.Common.TextBox",
                                 "defaultValue": "event-hubs-hec"
                             }
@@ -212,7 +212,7 @@
                     {
                         "name": "ehActivitySourcetype",
                         "label": "Activity Log Sourcetype",
-                        "toolTip": "Splunk sourcetype for activity logs",
+                        "toolTip": "Splunk sourcetype for activity logs.",
                         "type": "Microsoft.Common.TextBox",
                         "defaultValue": "azure:activity:log",
                         "placeholder": "azure:activity:log",
@@ -269,8 +269,8 @@
                             },
                             {
                                 "name": "ehAADSASourcetype",
-                                "label": "AAD Sign-in and Audit Sourcetype",
-                                "toolTip": "Splunk sourcetype for Azure AD sign-in and activity data.",
+                                "label": "AAD Sign-in and Audit Sourcetype Base",
+                                "toolTip": "Splunk sourcetype base for Azure AD sign-in and activity data.",
                                 "type": "Microsoft.Common.TextBox",
                                 "defaultValue": "azure:aad",
                                 "placeholder": "azure:aad",
@@ -278,6 +278,16 @@
                                     "required": "[steps('ehAADLogs').ehAADSASection.ehAADSAEnable]"
                                 },
                                 "visible": "[steps('ehAADLogs').ehAADSASection.ehAADSAEnable]"
+                            },
+                            {
+                                "name": "ehAADSASourcetypeInfo",
+                                "type": "Microsoft.Common.InfoBox",
+                                "visible": "[steps('ehAADLogs').ehAADSASection.ehAADSAEnable]",
+                                "options": {
+                                  "icon": "Info",
+                                  "text": "The base sourcetype will be combined with the event category to construct the full Splunk sourcetype.",
+                                  "uri": "https://github.com/splunk/azure-functions-splunk/tree/event-hubs/event-hubs-hec#splunk-sourcetypes"
+                                }
                             }
                         ]
                     },
@@ -332,6 +342,16 @@
                                     "required": "[steps('ehAADLogs').ehAADNISection.ehAADNIEnable]"
                                 },
                                 "visible": "[steps('ehAADLogs').ehAADNISection.ehAADNIEnable]"
+                            },
+                            {
+                                "name": "ehAADNISourcetypeInfo",
+                                "type": "Microsoft.Common.InfoBox",
+                                "visible": "[steps('ehAADLogs').ehAADNISection.ehAADNIEnable]",
+                                "options": {
+                                  "icon": "Info",
+                                  "text": "The base sourcetype will be combined with the event category to construct the full Splunk sourcetype.",
+                                  "uri": "https://github.com/splunk/azure-functions-splunk/tree/event-hubs/event-hubs-hec#splunk-sourcetypes"
+                                }
                             }
                         ]
                     },
@@ -386,6 +406,16 @@
                                     "required": "[steps('ehAADLogs').ehAADSPSection.ehAADSPEnable]"
                                 },
                                 "visible": "[steps('ehAADLogs').ehAADSPSection.ehAADSPEnable]"
+                            },
+                            {
+                                "name": "ehAADSPSourcetypeInfo",
+                                "type": "Microsoft.Common.InfoBox",
+                                "visible": "[steps('ehAADLogs').ehAADSPSection.ehAADSPEnable]",
+                                "options": {
+                                  "icon": "Info",
+                                  "text": "The base sourcetype will be combined with the event category to construct the full Splunk sourcetype.",
+                                  "uri": "https://github.com/splunk/azure-functions-splunk/tree/event-hubs/event-hubs-hec#splunk-sourcetypes"
+                                }
                             }
                         ]
                     }
@@ -432,8 +462,8 @@
                     },
                     {
                         "name": "ehDiagnosticsSourcetype",
-                        "label": "Diagnostics Log Sourcetype",
-                        "toolTip": "Splunk sourcetype for diagnostics logs",
+                        "label": "Diagnostics Log Default Sourcetype",
+                        "toolTip": "Splunk default sourcetype for diagnostics logs.",
                         "type": "Microsoft.Common.TextBox",
                         "defaultValue": "azure:diagnostics",
                         "placeholder": "azure:diagnostics",
@@ -441,6 +471,16 @@
                             "required": "[steps('ehDiagnosticsLogs').ehDiagnosticsEnable]"
                         },
                         "visible": "[steps('ehDiagnosticsLogs').ehDiagnosticsEnable]"
+                    },
+                    {
+                        "name": "ehDiagnosticsSourcetypeInfo",
+                        "type": "Microsoft.Common.InfoBox",
+                        "visible": "[steps('ehDiagnosticsLogs').ehDiagnosticsEnable]",
+                        "options": {
+                          "icon": "Info",
+                          "text": "The function code will attempt to create a Splunk sourcetype based on the resourceId of the event. If a sourcetype cannot be constructed from the event, the specified default sourcetype entered will be used.",
+                          "uri": "https://github.com/splunk/azure-functions-splunk/tree/event-hubs/event-hubs-hec#splunk-sourcetypes"
+                        }
                     }
                 ]
             },
@@ -486,7 +526,7 @@
                     {
                         "name": "ehMetricsSourcetype",
                         "label": "Metrics Sourcetype",
-                        "toolTip": "Splunk sourcetype for metrics",
+                        "toolTip": "Splunk sourcetype for metrics.",
                         "type": "Microsoft.Common.TextBox",
                         "defaultValue": "azure:metrics",
                         "placeholder": "azure:metrics",
