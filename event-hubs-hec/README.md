@@ -23,10 +23,11 @@ An Event Hub Namespace will contain one or more Event Hubs.  Refer to the Micros
 
 ### 3. Send data to an Event Hub
 Microsoft Azure uses [diagnostics settings](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings) to define data export and destination rules.  Each resource to be monitored must have a diagnostic setting.  Diagnostic settings can be defined using the Azure portal, PowerShell, [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/monitor/diagnostic-settings?view=azure-cli-latest), [Resource Manager templates](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings), REST API, or an Azure Policy.
-
 * [Sending Azure Activity log data to an Event Hub using the Azure Portal walkthrough](docs/activity_log_diagnostic_settings.md)
-* [Sending Azure Diagnostic logs and metrics to an Event Hub](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings)
 * [Sending Azure Active Directory logs to an Event Hub](docs/azure_ad_diagnostic_settings.md)
+* [Sending Azure Diagnostic logs to an Event Hub](docs/diagnostic_logs_settings.md)
+* [Sending Azure Metrics to an Event Hub](docs/metrics_settings.md)
+
 * Sending Azure Virtual Machine data to an Event Hub
   * [Windows VMs](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-windows)
   * [Linux VMs](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-linux)

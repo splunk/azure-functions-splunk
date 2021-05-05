@@ -11,7 +11,7 @@
   * Note: at least 4 partitions are recommended
 * Click the **Create** button
 
-## Send Azure Active Directory Logs to an Event Hub
+## Use a Diagnostic Setting to Send Logs to the Event Hub
 * From the Azure Portal, select Azure Active Directory
 * In the **Monitoring** section, select **Diagnostic settings**
 * Choose an existing setting or create a new setting
