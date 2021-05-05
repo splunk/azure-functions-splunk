@@ -71,7 +71,7 @@
             "type": "string",
             "defaultValue": "azure:aad",
             "metadata": {
-                "description": "Splunk source type for the Azure Active Directory log Event Hub"
+                "description": "Splunk sourcetype base for the Azure Active Directory Sign-in and Audit log Event Hub"
             }
         },
         "aadLogDisabled": {
@@ -97,7 +97,7 @@
             "type": "string",
             "defaultValue": "azure:aad:signin:noninteractive",
             "metadata": {
-                "description": "Splunk source type for the Azure Active Directory non-interactive log Event Hub"
+                "description": "Splunk sourcetype base for the Azure Active Directory non-interactive log Event Hub"
             }
         },
         "aadNoninteractiveLogDisabled": {
@@ -123,7 +123,7 @@
             "type": "string",
             "defaultValue": "azure:aad:signin:serviceprincipal",
             "metadata": {
-                "description": "Splunk source type for the Azure Active Directory Service Principal log Event Hub"
+                "description": "Splunk sourcetype base for the Azure Active Directory Service Principal log Event Hub"
             }
         },
         "aadServicePrincipalLogDisabled": {
@@ -175,7 +175,7 @@
             "type": "string",
             "defaultValue": "azure:diagnostics",
             "metadata": {
-                "description": "Splunk source type for the diagnostics Event Hub"
+                "description": "Splunk sourcetype default for the diagnostics Event Hub"
             }
         },
         "diagnosticsDisabled": {
