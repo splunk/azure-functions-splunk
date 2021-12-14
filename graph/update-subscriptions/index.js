@@ -61,6 +61,14 @@ module.exports = async function (context, myTimer) {
         let subscription = subscriptionsToCheck[i];
         splunk.logInfo(`[update-subscriptions] checking subscription ${JSON.stringify(subscription)}`);
 
+        if (subscriptionHasExpired(subscription.subscriptionExpirationDateTime)) {
+            let msg = `[update-subscriptions] a subscription with subscription Id '${subscription.subscriptionId}' has expired. Removing the blob item...`
+            context.log.warn(msg);
+            splunk.logWarning(msg);
+            containerClient.deleteBlob(subscription.subscriptionId);
+            continue;
+        }
+
         if (!subscriptionExpiresSoon(subscription.subscriptionExpirationDateTime)) {
             continue;
         }
@@ -95,6 +103,16 @@ module.exports = async function (context, myTimer) {
 
     }
 };
+
+function subscriptionHasExpired(expirationDateTime) {
+
+    let subscriptionExpirationDateTime = Date.parse(expirationDateTime);
+
+    let now = new Date();
+
+    // has it expired
+    return subscriptionExpirationDateTime > now;
+}
 
 function subscriptionExpiresSoon(expirationDateTime) {
 
