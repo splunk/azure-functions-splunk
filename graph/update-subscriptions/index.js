@@ -111,7 +111,7 @@ function subscriptionHasExpired(expirationDateTime) {
     let now = new Date();
 
     // has it expired
-    return subscriptionExpirationDateTime > now;
+    return subscriptionExpirationDateTime < now;
 }
 
 function subscriptionExpiresSoon(expirationDateTime) {
