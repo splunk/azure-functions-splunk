@@ -14,6 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+const { BlobServiceClient, BlockBlobClient } = require("@azure/storage-blob");
+const blobServiceClient = BlobServiceClient.fromConnectionString(process.env["AzureWebJobsStorage"]);
+const containerClient = blobServiceClient.getContainerClient('subscriptions');
 const graph = require('../helpers/graph');
 const splunk = require('../helpers/splunk');
 
@@ -30,6 +33,7 @@ module.exports = async function (context, req) {
                 msg = `[delete-subscription] deleted subscription with ID ${subscriptionId}`
                 context.log(msg);
                 splunk.logInfo(msg);
+                containerClient.deleteBlob(subscriptionId);
                 context.res = {
                     body: msg
                 }
