@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const { BlobServiceClient, BlockBlobClient } = require("@azure/storage-blob");
+const { BlobServiceClient } = require("@azure/storage-blob");
 const blobServiceClient = BlobServiceClient.fromConnectionString(process.env["AzureWebJobsStorage"]);
 const containerClient = blobServiceClient.getContainerClient('subscriptions');
 const graph = require('../helpers/graph');
