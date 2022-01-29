@@ -536,7 +536,22 @@
                         "visible": "[steps('ehMetrics').ehMetricsEnable]"
                     }
                 ]
-            }
+            },
+            {
+                "name": "tags",
+                "label": "Tags",
+                "elements": [
+                  {
+                    "name": "tagsByResource",
+                    "type": "Microsoft.Common.TagsByResource",
+                    "resources": [
+                      "Microsoft.Storage/storageAccounts",
+                      "Microsoft.Insights/components",
+                      "Microsoft.Web/sites"
+                    ]
+                  }
+                ]
+              }
         ],
         "outputs": {
             "storageAccountType": "[steps('basics').storageAccountType]",
@@ -577,7 +592,9 @@
             "metricsHubName": "[steps('ehMetrics').ehMetricsDropDown]",
             "metricsEventHubConsumerGroup": "[steps('ehMetrics').ehMetricsConsumerGroupDropDown]",
             "metricsSourceType": "[steps('ehMetrics').ehMetricsSourcetype]",
-            "metricsDisabled": "[if(steps('ehMetrics').ehMetricsEnable, false, true)]"
+            "metricsDisabled": "[if(steps('ehMetrics').ehMetricsEnable, false, true)]",
+
+            "tagsByResource": "[steps('tags').tagsByResource]"
         }
     }
 }

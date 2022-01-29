@@ -206,6 +206,11 @@
             "metadata": {
                 "description": "Splunk HEC token. For details, refer to the <a href='https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector'>Splunk documentation</a>."
             }
+        },
+
+        "tagsByResource": {
+            "type": "object",
+            "defaultValue": {}
         }
     },
     "variables": {
@@ -218,6 +223,7 @@
             "name": "[variables('storageAccountName')]",
             "apiVersion": "2019-06-01",
             "location": "[resourceGroup().location]",
+            "tags": "[if(contains(parameters('tagsByResource'), 'Microsoft.Storage/storageAccounts'), parameters('tagsByResource')['Microsoft.Storage/storageAccounts'], json('{}'))]",
             "kind": "Storage",
             "sku": {
                 "name": "[parameters('storageAccountType')]"
@@ -229,6 +235,7 @@
             "type": "Microsoft.Insights/components",
             "kind": "web",
             "location": "[resourceGroup().location]",
+            "tags": "[if(contains(parameters('tagsByResource'), 'Microsoft.Insights/components'), parameters('tagsByResource')['Microsoft.Insights/components'], json('{}'))]",
             "properties": {
                 "Application_Type": "web"
             }
@@ -238,6 +245,7 @@
             "type": "Microsoft.Web/sites",
             "name": "[variables('functionAppName')]",
             "location": "[resourceGroup().location]",
+            "tags": "[if(contains(parameters('tagsByResource'), 'Microsoft.Web/sites'), parameters('tagsByResource')['Microsoft.Web/sites'], json('{}'))]",
             "kind": "functionapp",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
