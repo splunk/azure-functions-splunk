@@ -26,16 +26,43 @@
                     "required": true,
                     "allowedValues": [
                         {
-                            "label": "Standard_LRS",
+                            "label": "Standard Locally Redundant Storage",
                             "value": "Standard_LRS"
                         },
                         {
-                            "label": "Standard_GRS",
+                            "label": "Standard Geo Replicated Storage",
                             "value": "Standard_GRS"
                         },
                         {
-                            "label": "Standard_RAGRS",
+                            "label": "Standard Read-Access Geo Replicated Storage",
                             "value": "Standard_RAGRS"
+                        },
+                        {
+                            "label": "Standard Zone Redundant Storage",
+                            "value": "Standard_ZRS"
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "storageAccountTLS",
+                "label": "Storage Account Minimum TLS Version",
+                "type": "Microsoft.Common.DropDown",
+                "toolTip": "Minimum TLS Version",
+                "constraints": {
+                    "required": true,
+                    "allowedValues": [
+                        {
+                            "label": "TLS 1.0",
+                            "value": "TLS1_0"
+                        },
+                        {
+                            "label": "TLS 1.1",
+                            "value": "TLS1_1"
+                        },
+                        {
+                            "label": "TLS 1.2",
+                            "value": "TLS1_2"
                         }
                     ]
                 }
@@ -555,6 +582,7 @@
         ],
         "outputs": {
             "storageAccountType": "[steps('basics').storageAccountType]",
+            "storageAccountTLS": "[steps('basics').storageAccountTLS]",
             "appName": "[steps('basics').appName]",
 
             "eventHubConnectionString": "[steps('appSettings').ehPolicyKeyApi.primaryConnectionString]",

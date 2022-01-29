@@ -14,10 +14,23 @@
             "allowedValues": [
                 "Standard_LRS",
                 "Standard_GRS",
-                "Standard_RAGRS"
+                "Standard_RAGRS",
+                "Standard_ZRS"
             ],
             "metadata": {
                 "description": "Storage Account type"
+            }
+        },
+        "storageAccountTLS": {
+            "type": "string",
+            "defaultValue": "TLS1_2",
+            "allowedValues": [
+                "TLS1_0",
+                "TLS1_1",
+                "TLS1_2"
+            ],
+            "metadata": {
+                "description": "Storage Account TLS version"
             }
         },
         "eventHubConnectionString": {
@@ -227,6 +240,9 @@
             "kind": "Storage",
             "sku": {
                 "name": "[parameters('storageAccountType')]"
+            },
+            "properties": {
+                "minimumTlsVersion": "[parameters('storageAccountTLS')]"
             }
         },
         {
