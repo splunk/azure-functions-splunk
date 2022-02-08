@@ -61,6 +61,14 @@ module.exports = async function (context, myTimer) {
         let subscription = subscriptionsToCheck[i];
         splunk.logInfo(`[update-subscriptions] checking subscription ${JSON.stringify(subscription)}`);
 
+        if (subscriptionHasExpired(subscription.subscriptionExpirationDateTime)) {
+            let msg = `[update-subscriptions] a subscription with subscription Id '${subscription.subscriptionId}' has expired. Removing the blob item...`
+            context.log.warn(msg);
+            splunk.logWarning(msg);
+            containerClient.deleteBlob(subscription.subscriptionId);
+            continue;
+        }
+
         if (!subscriptionExpiresSoon(subscription.subscriptionExpirationDateTime)) {
             continue;
         }
@@ -84,25 +92,27 @@ module.exports = async function (context, myTimer) {
                 blockBlobClient.upload(blobContent, blobContent.length);
             })
             .catch((err) => {
-                if ((err.statusCode = 404) && (!err.message.includes("timed out"))) {
-                    // Looks like this subscription was removed, so remove it from the blob container.
-                    let msg = `[update-subscriptions] a subscription with subscription Id '${subscription.subscriptionId}' was not found from Graph. Removing the blob item...`
-                    context.log.warn(msg);
-                    splunk.logWarning(msg);
-                    containerClient.deleteBlob(subscription.subscriptionId);
-                } else {
-                    let errorMsg = `[update-subscriptions] could not update subscription from Graph: ${subscription.subscriptionId}, error: ${JSON.stringify(err)}`
-                    context.log.error(errorMsg);
-                    splunk.logError(errorMsg);
-                    context.res = {
-                        body: errorMsg
-                    };
-                    return;
-                }
+                let errorMsg = `[update-subscriptions] could not update subscription from Graph: ${subscription.subscriptionId}, error: ${JSON.stringify(err)}`
+                context.log.error(errorMsg);
+                splunk.logError(errorMsg);
+                context.res = {
+                    body: errorMsg
+                };
+                return;
             });
 
     }
 };
+
+function subscriptionHasExpired(expirationDateTime) {
+
+    let subscriptionExpirationDateTime = Date.parse(expirationDateTime);
+
+    let now = new Date();
+
+    // has it expired
+    return subscriptionExpirationDateTime < now;
+}
 
 function subscriptionExpiresSoon(expirationDateTime) {
 
