@@ -203,8 +203,7 @@
                     {
                         "name": "ehActivityEnable",
                         "type": "Microsoft.Common.CheckBox",
-                        "label": "Enable Activity Log Event Hub Functions",
-                        "defaultValue": "true"
+                        "label": "Enable Activity Log Event Hub Functions"
                     },
                     {
                         "name": "ehActivityDropDown",
