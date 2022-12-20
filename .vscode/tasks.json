@@ -8,7 +8,7 @@
 			"isBackground": true,
 			"dependsOn": "npm install",
 			"options": {
-				"cwd": "${workspaceFolder}/event-hubs-hec"
+				"cwd": "${workspaceFolder}/storage-hec"
 			}
 		},
 		{
@@ -16,7 +16,7 @@
 			"label": "npm install",
 			"command": "npm install",
 			"options": {
-				"cwd": "${workspaceFolder}/event-hubs-hec"
+				"cwd": "${workspaceFolder}/storage-hec"
 			}
 		},
 		{
@@ -25,7 +25,7 @@
 			"command": "npm prune --production",
 			"problemMatcher": [],
 			"options": {
-				"cwd": "${workspaceFolder}/event-hubs-hec"
+				"cwd": "${workspaceFolder}/storage-hec"
 			}
 		}
 	]
