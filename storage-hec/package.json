@@ -1,0 +1,13 @@
+{
+  "name": "storage-hec",
+  "version": "1.0.0",
+  "description": "Sends Azure Storage data to Splunk's HTTP Event Collector",
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {
+    "axios": ">=0.21.2"
+  },
+  "devDependencies": {}
+}
