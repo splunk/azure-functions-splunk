@@ -1,5 +1,7 @@
 # Azure Functions for Splunk and Microsoft Graph
 
+> Microsoft Teams call record data is currently the only supported source for these functions
+
 A collection of Azure Functions for:
 * Managing Microsoft Graph notification [subscriptions](https://docs.microsoft.com/en-us/graph/api/resources/subscription)
 * Retrieving data about notifications received from Microsoft Graph subscriptions
