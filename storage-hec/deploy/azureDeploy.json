@@ -129,10 +129,6 @@
                             "value": "~3"
                         },
                         {
-                            "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[toLower(variables('functionAppName'))]"
-                        },
-                        {
                             "name": "SPLUNK_HEC_TOKEN",
                             "value": "[parameters('SplunkToken')]"
                         },
