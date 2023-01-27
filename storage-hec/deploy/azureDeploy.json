@@ -20,6 +20,18 @@
                 "description": "Storage Account type"
             }
         },
+        "storageAccountTLS": {
+            "type": "string",
+            "defaultValue": "TLS1_2",
+            "allowedValues": [
+                "TLS1_0",
+                "TLS1_1",
+                "TLS1_2"
+            ],
+            "metadata": {
+                "description": "Storage Account TLS version"
+            }
+        },
         "nsgConnectionString": {
             "type": "string",
             "metadata": {
@@ -43,7 +55,7 @@
         "denormalizeEvents": {
             "type": "bool",
             "metadata": {
-                "description": "description"
+                "description": ""
             }
         },
         "githubRepoURL": {
@@ -53,6 +65,10 @@
         "githubRepoBranch": {
             "type": "string",
             "defaultValue": "master"
+        },
+        "githubRepoProject": {
+            "type": "string",
+            "defaultValue": "storage-hec"
         },
         "SplunkEndpoint": {
             "type": "string",
@@ -80,6 +96,9 @@
             "kind": "Storage",
             "sku": {
                 "name": "[parameters('storageAccountType')]"
+            },
+            "properties": {
+                "minimumTlsVersion": "[parameters('storageAccountTLS')]"
             }
         },
         {
@@ -138,7 +157,7 @@
                         },
                         {
                             "name": "Project",
-                            "value": "storage-hec"
+                            "value": "[parameters('githubRepoProject')]"
                         },
                         {
                             "name": "BLOB_PATH",
