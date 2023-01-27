@@ -1,9 +1,9 @@
 {
     "azureFunctions.postDeployTask": "npm install",
     "azureFunctions.projectLanguage": "JavaScript",
-    "azureFunctions.projectRuntime": "~3",
+    "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.preDeployTask": "npm prune",
-    "azureFunctions.deploySubpath": "event-hubs-hec",
-    "azureFunctions.projectSubpath": "event-hubs-hec"
+    "azureFunctions.deploySubpath": "storage-hec",
+    "azureFunctions.projectSubpath": "storage-hec"
 }

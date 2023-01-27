@@ -1,0 +1,219 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+    "handler": "Microsoft.Azure.CreateUIDef",
+    "version": "0.1.2-preview",
+    "parameters": {
+        "basics": [
+            {
+                "name": "appServiceAvailabilityApi",
+                "type": "Microsoft.Solutions.ArmApiControl",
+                "visible": false,
+                "request": {
+                  "method": "POST",
+                  "path": "[concat(subscription().id, '/providers/Microsoft.Web/checknameavailability?api-version=2022-03-01')]",
+                  "body": "[parse(concat('{\"name\":\"', concat('', steps('basics').appName), '\", \"type\": \"Microsoft.Web/sites\"}'))]"
+                }
+            },
+            {
+                "name": "appName",
+                "label": "Function App Name",
+                "type": "Microsoft.Common.TextBox",
+                "toolTip": "The name of the function app that you wish to create.",
+                "visible": true,
+                "placeholder": "functionappname",
+                "constraints": {
+                    "validations": [
+                        {
+                            "isValid": "[not(equals(steps('basics').appServiceAvailabilityApi.nameAvailable, false))]",
+                            "message": "[concat('Error with the url: ', steps('basics').appName, '. Reason: ', steps('basics').appServiceAvailabilityApi.reason)]"
+                        }
+                    ],
+                    "required": true
+                }
+            },
+            {
+                "name": "storageAccountType",
+                "label": "Storage Account Type",
+                "type": "Microsoft.Common.DropDown",
+                "toolTip": "The storage account will contain a blob container for undeliverable events.",
+                "constraints": {
+                    "required": true,
+                    "allowedValues": [
+                        {
+                            "label": "Standard Locally Redundant Storage",
+                            "value": "Standard_LRS"
+                        },
+                        {
+                            "label": "Standard Geo Replicated Storage",
+                            "value": "Standard_GRS"
+                        },
+                        {
+                            "label": "Standard Read-Access Geo Replicated Storage",
+                            "value": "Standard_RAGRS"
+                        },
+                        {
+                            "label": "Standard Zone Redundant Storage",
+                            "value": "Standard_ZRS"
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "storageAccountTLS",
+                "label": "Storage Account Minimum TLS Version",
+                "type": "Microsoft.Common.DropDown",
+                "toolTip": "Minimum TLS Version",
+                "constraints": {
+                    "required": true,
+                    "allowedValues": [
+                        {
+                            "label": "TLS 1.0",
+                            "value": "TLS1_0"
+                        },
+                        {
+                            "label": "TLS 1.1",
+                            "value": "TLS1_1"
+                        },
+                        {
+                            "label": "TLS 1.2",
+                            "value": "TLS1_2"
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "nsgSection",
+                "type": "Microsoft.Common.Section",
+                "label": "NSG Location Details",
+                "elements": [
+                    {
+                        "name": "nsgConnectionString",
+                        "label": "Storage Account Connection String",
+                        "type": "Microsoft.Common.TextBox",
+                        "toolTip": "The connection string to the stroage account containing NSG Flow Logs",
+                        "constraints": {
+                            "required": true
+                        }
+                    },
+                    {
+                        "name": "nsgContainer",
+                        "label": "NSG Container",
+                        "type": "Microsoft.Common.TextBox",
+                        "toolTip": "The blob container that contains the NSG Flow Logs",
+                        "constraints": {
+                            "required": true
+                        }
+                    },
+                    {
+                        "name": "nsgSourcetype",
+                        "label": "NSG Source Type",
+                        "type": "Microsoft.Common.TextBox",
+                        "toolTip": "Splunk Souretype for the NSG Logs",
+                        "defaultValue": "azure:nsg:flowlog",
+                        "constraints": {
+                            "required": true
+                        }
+                    },
+                    {
+                        "name": "denormalizeEvents",
+                        "label": "Denormalize Events",
+                        "type": "Microsoft.Common.DropDown",
+                        "toolTip": "",
+                        "defaultValue": ["True"],
+                        "multiselect": false,
+                        "multiLine": true,
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "True",
+                                    "description": "Separate flow tuples into individual Splunk events",
+                                    "value": "true"
+                                },
+                                {
+                                    "label": "False",
+                                    "description": "Keep multiple flow tuples in a single Splunk event",
+                                    "value": "false"
+                                }
+                            ],
+                            "required": true
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "splunkHECSection",
+                "type": "Microsoft.Common.Section",
+                "label": "Splunk HTTP Event Collector Details",
+                "elements": [
+                    {
+                        "name": "splunkHECEndpoint",
+                        "label": "Splunk HEC Endpoint",
+                        "toolTip": "URL for the Splunk HTTP Event Collector.",
+                        "type": "Microsoft.Common.TextBox",
+                        "placeholder": "https://<YOUR SPLUNK URL>:<PORT>/services/collector/event",
+                        "constraints": {
+                            "required": true
+                        }
+                    },
+                    {
+                        "name": "splunkHECToken",
+                        "label": "Splunk HEC Token",
+                        "toolTip": "Splunk HTTP Event Collector Token.",
+                        "type": "Microsoft.Common.TextBox",
+                        "constraints": {
+                            "required": true
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "repoSection",
+                "type": "Microsoft.Common.Section",
+                "label": "Function Repository",
+                "elements": [
+                    {
+                        "name": "repoURL",
+                        "label": "Repository URL",
+                        "toolTip": "URL for the function code.",
+                        "type": "Microsoft.Common.TextBox",
+                        "defaultValue": "https://github.com/splunk/azure-functions-splunk.git",
+                        "constraints": {
+                            "required": true
+                        }
+                    },
+                    {
+                        "name": "repoBranch",
+                        "label": "Branch",
+                        "defaultValue": "master",
+                        "type": "Microsoft.Common.TextBox",
+                        "constraints": {
+                            "required": true
+                        }
+                    },
+                    {
+                        "name": "repoProject",
+                        "label": "Project",
+                        "toolTip": "If the source code for the function resides in a subdirectory, specify the subdirectory containing the code.",
+                        "type": "Microsoft.Common.TextBox",
+                        "defaultValue": "event-hubs-hec"
+                    }
+                ]
+            }
+        ],
+        "steps": [],
+        "outputs": {
+            "appName": "[steps('basics').appName]",
+            "storageAccountType": "[steps('basics').storageAccountType]",
+            "storageAccountTLS": "[steps('basics').storageAccountTLS]",
+            "nsgConnectionString": "[steps('basics').nsgSection.nsgConnectionString]",
+            "nsgContainer": "[steps('basics').nsgSection.nsgContainer]",
+            "nsgSourceType": "[steps('basics').nsgSection.nsgSourcetype]",
+            "denormalizeEvents": "[steps('basics').nsgSection.denormalizeEvents]",
+            "SplunkEndpoint": "[steps('basics').splunkHECSection.splunkHECEndpoint]",
+            "SplunkToken": "[steps('basics').splunkHECSection.splunkHECToken]",
+            "githubRepoURL": "[steps('basics').repoSection.repoURL]",
+            "githubRepoBranch": "[steps('basics').repoSection.repoBranch]",
+            "githubRepoProject": "[steps('basics').repoSection.repoProject]"
+        }
+    }
+}
