@@ -1,7 +1,7 @@
 # Azure Functions for Sending Azure Stroage data to a Splunk HTTP Event Collector
 Azure storage operations can trigger serverless Azure Functions.  Azure Functions can further process the raw events in near real-time.
 
-<a href="https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsplunk%2Fazure-functions-splunk%2Fmaster%2Fblob-hec%2Fdeploy%2FazureDeploy.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fsplunk%2Fazure-functions-splunk%2Fmaster%2Fblob-hec%2Fdeploy%2FazureDeploy.portal.json" target="_blank">
+<a href="https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsplunk%2Fazure-functions-splunk%2Fmaster%2Fstorage-hec%2Fdeploy%2FazureDeploy.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fsplunk%2Fazure-functions-splunk%2Fmaster%2Fstorage-hec%2Fdeploy%2FazureDeploy.portal.json" target="_blank">
 <img src="https://aka.ms/deploytoazurebutton"/>
 </a>
 
@@ -11,8 +11,8 @@ This repository contains a collection of Azure Functions for:
   * Optionally, this function can denormalize the events by making each flow tuple a distinct Splunk event
 * Formatting events in the `event` format for a Splunk HTTP Event Collector
 * Sending event data to Splunk via [HTTP Event Collector](https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector)
-* Writing event data to a Storage Blob container if data cannot successfully be sent to Splunk
-  * The [Splunk Add-on for Microsoft Cloud Services](https://splunkbase.splunk.com/app/3110/) can be utilized to retrieve Storage Blob data
+* Writing event data to a separate Storage Blob container if data cannot successfully be sent to Splunk
+  * The [Splunk Add-on for Microsoft Cloud Services](https://splunkbase.splunk.com/app/3110/) can be utilized to retrieve Storage Blob data from the separate container
 
 ## Getting Started
 
@@ -22,9 +22,19 @@ An HTTP Event Collector receives data pushed from the Azure Functions.  Refer to
 ### 2. Create an Azure Storage Account
 Refer to the Microsoft documentation for [Azure Storage Account setup instructions](https://learn.microsoft.com/azure/storage/common/storage-account-create).
 
-### 3. Send data to an Azure Storage Account
+### 3. Configuring NSG Flow Logs in the Azure Portal
 
+* From the Azure Portal, navigate to a Network Watcher instance and select Flow Logs
 
+![](docs/images/NSG1.jpeg)
+
+* Select a Network Security Group from the list by clicking it
+
+![](docs/images/NSG2.jpeg)
+
+* Navigate to the correct storage account and then Containers -> insights-logs-networksecuritygroupflowevent
+
+![](docs/images/NSG3.jpeg)
 
 ### 4. Deploy the functions to Azure
 
