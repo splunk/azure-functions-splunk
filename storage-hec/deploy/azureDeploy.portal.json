@@ -195,7 +195,7 @@
                         "label": "Project",
                         "toolTip": "If the source code for the function resides in a subdirectory, specify the subdirectory containing the code.",
                         "type": "Microsoft.Common.TextBox",
-                        "defaultValue": "event-hubs-hec"
+                        "defaultValue": "storage-hec"
                     }
                 ]
             }
