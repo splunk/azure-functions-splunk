@@ -41,7 +41,7 @@ Refer to the Microsoft documentation for [Azure Storage Account setup instructio
 Use the "Deploy to Azure" button above to deploy the Azure Functions from this repo to your Azure account.  During setup, you will be prompted for the following information:
 
 * Blob Path - this is the blob container containing the NSG Flow logs
-* Blob Connection STring - this is the connection string for the Azure Storage Account
+* Blob Connection String - this is the connection string for the Azure Storage Account
 * NSG Sourcetype
 * Splunk [HTTP Event Collector](https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector) Endpoint
 * Splunk [HTTP Event Collector](https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector) Token
