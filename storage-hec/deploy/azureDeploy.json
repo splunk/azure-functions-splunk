@@ -40,7 +40,7 @@
         },
         "nsgContainer": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "insights-logs-networksecuritygroupflowevent",
             "metadata": {
                 "description": "Blob container for NSG flow logs"
             }
