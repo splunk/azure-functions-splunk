@@ -100,6 +100,7 @@
                         "label": "NSG Container",
                         "type": "Microsoft.Common.TextBox",
                         "toolTip": "The blob container that contains the NSG Flow Logs",
+                        "defaultValue": "insights-logs-networksecuritygroupflowevent",
                         "constraints": {
                             "required": true
                         }
