@@ -1,0 +1,27 @@
+{
+  "bindings": [
+    {
+      "type": "blobTrigger",
+      "name": "vnetBlobTrigger",
+      "direction": "in",
+      "connection": "VNET_BLOB_CONNECTION_STRING",
+      "dataType": "string",
+      "path": "%VNET_BLOB_PATH%/{name}"
+    },
+    {
+      "type": "blob",
+      "name": "vnetBlobInput",
+      "direction": "in",
+      "connection": "VNET_BLOB_CONNECTION_STRING",
+      "dataType": "string",
+      "path": "%VNET_BLOB_PATH%/{name}"
+    },
+    {
+      "name": "outputBlob",
+      "type": "blob",
+      "path": "undeliverable-vnet-events/{rand-guid}-{name}",
+      "connection": "VNET_BLOB_CONNECTION_STRING",
+      "direction": "out"
+    }
+  ]
+}
