@@ -38,6 +38,12 @@
                 "description": "Connection string for the storage account storing the NSG flow logs"
             }
         },
+        "processNsgFlow": {
+            "type": "bool",
+            "metadata": {
+                "description": "Whether or not to process new NSG flow records created in the \"Blob Container's\" \"Blob Path\""
+            }
+        },
         "nsgContainer": {
             "type": "string",
             "defaultValue": "insights-logs-networksecuritygroupflowevent",
@@ -52,23 +58,43 @@
                 "description": "Splunk source type for the NSG flow logs"
             }
         },
+        "processVnetFlow": {
+            "type": "bool",
+            "metadata": {
+                "description": "Whether or not to process new VNet flow records created in the \"VNet Blob Container's\" \"VNet Blob Path\""
+            }
+        },
+        "vnetConnectionString": {
+            "type": "string",
+            "metadata": {
+                "description": "Connection string for the storage account storing the VNet flow logs"
+            }
+        },
+        "vnetContainer": {
+            "type": "string",
+            "defaultValue": "insights-logs-flowlogsflowevent",
+            "metadata": {
+                "description": "Blob container for VNet flow logs"
+            }
+        },
+        "vnetSourceType": {
+            "type": "string",
+            "defaultValue": "azure:vnet:flowlog",
+            "metadata": {
+                "description": "Splunk source type for the VNet flow logs"
+            }
+        },
         "denormalizeEvents": {
             "type": "bool",
             "metadata": {
-                "description": ""
+                "description": "Whether or not to separate flow tuples into individual Splunk events"
             }
         },
-        "githubRepoURL": {
-            "type": "string",
-            "defaultValue": "https://github.com/splunk/azure-functions-splunk.git"
-        },
-        "githubRepoBranch": {
-            "type": "string",
-            "defaultValue": "master"
-        },
-        "githubRepoProject": {
-            "type": "string",
-            "defaultValue": "storage-hec"
+        "convertTupleToJson": {
+            "type": "bool",
+            "metadata": {
+                "description": "Whether or not to keep the original tuple format or convert it to json and enrich it with its parental JSON attributes from the overall flow record"
+            }
         },
         "SplunkEndpoint": {
             "type": "string",
@@ -141,11 +167,11 @@
                         },
                         {
                             "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                            "value": "~12"
+                            "value": "~22"
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~3"
+                            "value": "~4"
                         },
                         {
                             "name": "SPLUNK_HEC_TOKEN",
@@ -156,43 +182,48 @@
                             "value": "[parameters('SplunkEndpoint')]"
                         },
                         {
-                            "name": "Project",
-                            "value": "[parameters('githubRepoProject')]"
+                            "name": "PROCESS_NSG_FLOW",
+                            "value": "[parameters('processNsgFlow')]"
+                        },
+                        {
+                            "name": "PROCESS_VNET_FLOW",
+                            "value": "[parameters('processVnetFlow')]"
                         },
                         {
                             "name": "BLOB_PATH",
                             "value": "[parameters('nsgContainer')]"
                         },
                         {
+                            "name": "VNET_BLOB_PATH",
+                            "value": "[parameters('vnetContainer')]"
+                        },
+                        {
                             "name": "BLOB_CONNECTION_STRING",
                             "value": "[parameters('nsgConnectionString')]"
+                        },
+                        {
+                            "name": "VNET_BLOB_CONNECTION_STRING",
+                            "value": "[parameters('vnetConnectionString')]"
                         },
                         {
                             "name": "NSG_SOURCETYPE",
                             "value": "[parameters('nsgSourceType')]"
                         },
                         {
+                            "name": "VNET_SOURCETYPE",
+                            "value": "[parameters('vnetSourceType')]"
+                        },
+                        {
                             "name": "DENORMALIZE_EVENTS",
                             "value": "[parameters('denormalizeEvents')]"
+                        },
+                        {
+                            "name": "CONVERT_TUPLE_TO_JSON",
+                            "value": "[parameters('convertTupleToJson')]"
                         }
                     ]
                 }
-            },
-            "resources": [
-                {
-                    "apiVersion": "2016-08-01",
-                    "name": "web",
-                    "type": "sourcecontrols",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', variables('functionAppName'))]"
-                    ],
-                    "properties": {
-                        "RepoUrl": "[parameters('githubRepoURL')]",
-                        "branch": "[parameters('githubRepoBranch')]",
-                        "IsManualIntegration": true
-                    }
-                }
-            ] 
+            }
         }
     ]
 }

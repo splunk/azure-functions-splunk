@@ -87,34 +87,125 @@
                 "label": "NSG Location Details",
                 "elements": [
                     {
-                        "name": "nsgConnectionString",
-                        "label": "Storage Account Connection String",
-                        "type": "Microsoft.Common.TextBox",
-                        "toolTip": "The connection string to the stroage account containing NSG Flow Logs",
+                        "name": "processNsgFlow",
+                        "label": "Process NSG Flow",
+                        "type": "Microsoft.Common.DropDown",
+                        "toolTip": "",
+                        "defaultValue": ["True"],
+                        "multiselect": false,
+                        "multiLine": true,
                         "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "True",
+                                    "description": "Process new NSG flow records created in the NSG blob container",
+                                    "value": "true"
+                                },
+                                {
+                                    "label": "False",
+                                    "description": "Ignore all new NSG flow records created in the NSG blob container",
+                                    "value": "false"
+                                }
+                            ],
                             "required": true
+                        }
+                    },
+                    {
+                        "name": "nsgConnectionString",
+                        "label": "NSG Storage Account Connection String",
+                        "type": "Microsoft.Common.TextBox",
+                        "toolTip": "The connection string to the storage account containing NSG Flow Logs",
+                        "constraints": {
+                            "required": false
                         }
                     },
                     {
                         "name": "nsgContainer",
-                        "label": "NSG Container",
+                        "label": "NSG Blob Container/Path",
                         "type": "Microsoft.Common.TextBox",
                         "toolTip": "The blob container that contains the NSG Flow Logs",
                         "defaultValue": "insights-logs-networksecuritygroupflowevent",
+                        "constraints": {
+                            "required": false
+                        }
+                    },
+                    {
+                        "name": "nsgSourcetype",
+                        "label": "NSG Flow Log Source Type",
+                        "type": "Microsoft.Common.TextBox",
+                        "toolTip": "Splunk Source type for the NSG Flow Logs",
+                        "defaultValue": "azure:nsg:flowlog",
+                        "constraints": {
+                            "required": false
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "vnetSection",
+                "type": "Microsoft.Common.Section",
+                "label": "VNet Location Details",
+                "elements": [
+                    {
+                        "name": "processVnetFlow",
+                        "label": "Process VNet Flow",
+                        "type": "Microsoft.Common.DropDown",
+                        "toolTip": "",
+                        "defaultValue": ["True"],
+                        "multiselect": false,
+                        "multiLine": true,
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "True",
+                                    "description": "Process new VNet flow records created in the VNet blob container",
+                                    "value": "true"
+                                },
+                                {
+                                    "label": "False",
+                                    "description": "Ignore all new VNet flow records created in the VNet blob container",
+                                    "value": "false"
+                                }
+                            ],
+                            "required": true
+                        }
+                    },
+                    {
+                        "name": "vnetConnectionString",
+                        "label": "VNet Storage Account Connection String",
+                        "type": "Microsoft.Common.TextBox",
+                        "toolTip": "The connection string to the storage account containing VNet Flow Logs",
                         "constraints": {
                             "required": true
                         }
                     },
                     {
-                        "name": "nsgSourcetype",
-                        "label": "NSG Source Type",
+                        "name": "vnetContainer",
+                        "label": "VNet Blob Container/Path",
                         "type": "Microsoft.Common.TextBox",
-                        "toolTip": "Splunk Souretype for the NSG Logs",
-                        "defaultValue": "azure:nsg:flowlog",
+                        "toolTip": "The blob container that contains the VNet Flow Logs",
+                        "defaultValue": "insights-logs-flowlogflowevent",
                         "constraints": {
                             "required": true
                         }
                     },
+                    {
+                        "name": "vnetSourcetype",
+                        "label": "VNet Flow Log Source Type",
+                        "type": "Microsoft.Common.TextBox",
+                        "toolTip": "Splunk Source type for the VNet Flow Logs",
+                        "defaultValue": "azure:vnet:flowlog",
+                        "constraints": {
+                            "required": true
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "parsingSection",
+                "type": "Microsoft.Common.Section",
+                "label": "Parsing Settings",
+                "elements": [
                     {
                         "name": "denormalizeEvents",
                         "label": "Denormalize Events",
@@ -133,6 +224,30 @@
                                 {
                                     "label": "False",
                                     "description": "Keep multiple flow tuples in a single Splunk event",
+                                    "value": "false"
+                                }
+                            ],
+                            "required": true
+                        }
+                    },
+                    {
+                        "name": "convertTupleToJson",
+                        "label": "Convert Tuple to JSON",
+                        "type": "Microsoft.Common.DropDown",
+                        "toolTip": "",
+                        "defaultValue": ["True"],
+                        "multiselect": false,
+                        "multiLine": true,
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "True",
+                                    "description": "Change the format of the flow tuple to JSON, adding parental JSON attributes from the overall flow record",
+                                    "value": "true"
+                                },
+                                {
+                                    "label": "False",
+                                    "description": "Keep the original flow tuple format and do NOT add any parental JSON attributes from the overall flow record",
                                     "value": "false"
                                 }
                             ],
@@ -206,10 +321,16 @@
             "appName": "[steps('basics').appName]",
             "storageAccountType": "[steps('basics').storageAccountType]",
             "storageAccountTLS": "[steps('basics').storageAccountTLS]",
+            "processNsgFlow": "[steps('basics').nsgSection.processNsgFlow]",
             "nsgConnectionString": "[steps('basics').nsgSection.nsgConnectionString]",
             "nsgContainer": "[steps('basics').nsgSection.nsgContainer]",
             "nsgSourceType": "[steps('basics').nsgSection.nsgSourcetype]",
-            "denormalizeEvents": "[steps('basics').nsgSection.denormalizeEvents]",
+            "processVnetFlow": "[steps('basics').vnetSection.processVnetFlow]",
+            "vnetConnectionString": "[steps('basics').vnetSection.vnetConnectionString]",
+            "vnetContainer": "[steps('basics').vnetSection.vnetContainer]",
+            "vnetSourceType": "[steps('basics').vnetSection.vnetSourcetype]",
+            "denormalizeEvents": "[steps('basics').parsingSection.denormalizeEvents]",
+            "convertTupleToJson": "[steps('basics').parsingSection.convertTupleToJson]",
             "SplunkEndpoint": "[steps('basics').splunkHECSection.splunkHECEndpoint]",
             "SplunkToken": "[steps('basics').splunkHECSection.splunkHECToken]",
             "githubRepoURL": "[steps('basics').repoSection.repoURL]",
