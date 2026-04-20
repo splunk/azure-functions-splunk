@@ -10,7 +10,7 @@
     "@azure/storage-blob": "latest",
     "@microsoft/microsoft-graph-client": "^2.0.0",
     "adal-node": "^0.2.1",
-    "axios": "^1.6.8",
+    "axios": "^1.7.4",
     "isomorphic-fetch": "^2.2.1"
   },
   "devDependencies": {}
