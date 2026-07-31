@@ -61,11 +61,16 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('storageAccountName')]",
-            "apiVersion": "2019-06-01",
+            "apiVersion": "2023-01-01",
             "location": "[resourceGroup().location]",
             "kind": "Storage",
             "sku": {
                 "name": "[parameters('storageAccountType')]"
+            },
+            "properties": {
+                "allowBlobPublicAccess": false,
+                "supportsHttpsTrafficOnly": true,
+                "minimumTlsVersion": "TLS1_2"
             }
         },
         {
